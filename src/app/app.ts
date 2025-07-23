@@ -1,8 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { Auth0Config, auth0Config } from './app.config';
+import { API_BASE_URL, Auth0Config, auth0Config } from './app.config';
 import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,9 @@ export class App {
 
   constructor(
     public auth: AuthService,
-    @Inject(auth0Config) private config: Auth0Config
+    @Inject(auth0Config) private config: Auth0Config,
+    @Inject(API_BASE_URL) private apiBaseUrl: string,
+    private http: HttpClient
   ) {
     console.log('auth0Config:', this.config);
     // Initialize Auth0 service
@@ -32,6 +35,38 @@ export class App {
       }
     });
 
+  }
 
+  userMetadata() {
+    this.http.get(`${this.apiBaseUrl}/user-metadata`).subscribe({
+      next: (data) => {
+        console.log('User metadata:', data);
+      },
+      error: (error) => {
+        console.error('Error fetching user metadata:', error);
+      }
+    });
+  }
+
+  completeProfile() {
+    this.http.post(`${this.apiBaseUrl}/complete-profile`, {}).subscribe({
+      next: (data) => {
+        console.log('Profile completed:', data);
+      },
+      error: (error) => {
+        console.error('Error completing profile:', error);
+      }
+    });
+  }
+
+  uncompleteProfile() {
+    this.http.post(`${this.apiBaseUrl}/uncomplete-profile`, {}).subscribe({
+      next: (data) => {
+        console.log('Profile uncompleted:', data);
+      },
+      error: (error) => {
+        console.error('Error uncompleting profile:', error);
+      }
+    });
   }
 }
