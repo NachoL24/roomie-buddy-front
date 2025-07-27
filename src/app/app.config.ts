@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { provideAuth0, authHttpInterceptorFn } from '@auth0/auth0-angular';
 import { environment } from '../environments/env';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { REPOSITORY_PROVIDERS } from './infrastructure/providers/repository.providers';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 export const auth0Config = new InjectionToken<Auth0Config>('auth0Config');
@@ -37,7 +38,8 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     { provide: API_BASE_URL, useValue: environment.API_BASE_URL },
-    { provide: auth0Config, useValue: environment.auth0 }
+    { provide: auth0Config, useValue: environment.auth0 },
+    ...REPOSITORY_PROVIDERS
   ]
 };
 
