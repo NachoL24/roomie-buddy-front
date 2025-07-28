@@ -1,0 +1,167 @@
+<!-- Header/Navigation -->
+<mat-toolbar class="homepage-toolbar">
+  <div class="toolbar-content">
+    <div class="logo-section">
+      <span class="logo-text">🏠 RoomieBuddy</span>
+    </div>
+
+    <div class="nav-links">
+      <button mat-button>Features</button>
+      <button mat-button>Pricing</button>
+      <button mat-button>Support</button>
+      <button mat-raised-button color="primary" (click)="onSignIn()">
+        Sign In
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title">Administra tus finanzas con RoomieBuddy</h1>
+      <p class="hero-description">
+        RoomieBuddy es un administrador de finanzas que te ayuda a gestionar tus
+        finanzas con facilidad. Es simple, intuitivo y potente.
+      </p>
+      <button
+        mat-raised-button
+        color="primary"
+        class="get-started-btn"
+        (click)="onGetStarted()"
+      >
+        Comenzar
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Características Section -->
+<section class="characteristics-section">
+  <div class="section-content">
+    <h2 class="section-title">Características</h2>
+    <h3 class="section-subtitle">
+      Potentes características para una gestión financiera sin complicaciones
+    </h3>
+    <p class="section-description">
+      RoomieBuddy ofrece un conjunto completo de herramientas para simplificar
+      tu vida financiera, ya sea que estés gestionando gastos personales o
+      colaborando con otros.
+    </p>
+
+    <div class="features-grid">
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>account_balance_wallet</mat-icon>
+          <mat-card-title
+            >Gestión de Finanzas Personales y Grupales</mat-card-title
+          >
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Gestiona tus finanzas personales y colabora con grupos en gastos
+            compartidos.
+          </p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>home</mat-icon>
+          <mat-card-title>Múltiples Casas</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Crea y gestiona múltiples 'casas' o grupos para diferentes
+            situaciones de vida y proyectos.
+          </p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>support</mat-icon>
+          <mat-card-title>Soporte Multimoneda</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Realiza un seguimiento de los gastos y saldos en múltiples monedas
+            con conversión automática.
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="pricing-section">
+  <div class="section-content">
+    <h2 class="section-title">Precios</h2>
+
+    <div class="pricing-grid">
+      <!-- Basic Plan -->
+      <mat-card class="pricing-card basic-plan">
+        <mat-card-header>
+          <mat-card-title>Básico</mat-card-title>
+          <mat-card-subtitle>Gratis /mes</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <button mat-raised-button class="plan-btn">Comenzar</button>
+          <ul class="features-list">
+            <li><mat-icon>check</mat-icon> Gestión de Finanzas Personales</li>
+            <li><mat-icon>check</mat-icon> Informes Básicos</li>
+            <li><mat-icon>check</mat-icon> 1 Casa</li>
+            <li><mat-icon>check</mat-icon> Hasta 5 Usuarios</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Premium Plan -->
+      <mat-card class="pricing-card premium-plan">
+        <mat-card-header>
+          <div class="popular-badge">Popular</div>
+          <mat-card-title>Premium</mat-card-title>
+          <mat-card-subtitle>$20.00 /mes</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <button
+            mat-raised-button
+            color="primary"
+            class="plan-btn"
+            (click)="onUpgrade()"
+          >
+            Actualizar
+          </button>
+          <ul class="features-list">
+            <li><mat-icon>check</mat-icon> Todo en Básico</li>
+            <li><mat-icon>check</mat-icon> Gestión de Finanzas Grupales</li>
+            <li><mat-icon>check</mat-icon> Informes Avanzados</li>
+            <li><mat-icon>check</mat-icon> 5 Casas</li>
+            <li><mat-icon>check</mat-icon> Hasta 5 Usuarios por Casa</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Unlimited Plan -->
+      <mat-card class="pricing-card unlimited-plan">
+        <mat-card-header>
+          <mat-card-title>Ilimitado</mat-card-title>
+          <mat-card-subtitle>$30.00 /mes</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <button mat-raised-button class="plan-btn" (click)="onContactSales()">
+            Contactar a Ventas
+          </button>
+          <ul class="features-list">
+            <li><mat-icon>check</mat-icon> Soluciones Personalizadas</li>
+            <li><mat-icon>check</mat-icon> Soporte Dedicado</li>
+            <li><mat-icon>check</mat-icon> Casas Ilimitadas</li>
+            <li><mat-icon>check</mat-icon> 10 Usuarios por Casa</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>
