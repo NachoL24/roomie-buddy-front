@@ -1,0 +1,57 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { SettlementRepository, CreateSettlementData } from '../../domain/repositories';
+import { Settlement, BalanceSummary } from '../../domain/entities';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class SettlementService {
+    constructor(private settlementRepository: SettlementRepository) { }
+
+    createSettlement(settlementData: CreateSettlementData): Observable<Settlement> {
+        return this.settlementRepository.createSettlement(settlementData);
+    }
+
+    getHouseSettlements(houseId: number): Observable<Settlement[]> {
+        return this.settlementRepository.getSettlementsByHouse(houseId);
+    }
+
+    getHouseBalanceSummary(houseId: number): Observable<BalanceSummary> {
+        return this.settlementRepository.getBalanceSummary(houseId);
+    }
+
+    /**
+     * Creates a payment settlement between two roommates
+     */
+    makePayment(
+        fromRoomieId: number,
+        toRoomieId: number,
+        amount: number,
+        houseId: number,
+        description: string = 'Payment settlement'
+    ): Observable<Settlement> {
+        const settlementData: CreateSettlementData = {
+            fromRoomieId,
+            toRoomieId,
+            amount,
+            houseId,
+            description
+        };
+        return this.createSettlement(settlementData);
+    }
+
+    /**
+     * Creates a settlement for a specific expense
+     */
+    settleExpense(
+        fromRoomieId: number,
+        toRoomieId: number,
+        amount: number,
+        houseId: number,
+        expenseDescription: string
+    ): Observable<Settlement> {
+        const description = `Settlement for: ${expenseDescription}`;
+        return this.makePayment(fromRoomieId, toRoomieId, amount, houseId, description);
+    }
+}
