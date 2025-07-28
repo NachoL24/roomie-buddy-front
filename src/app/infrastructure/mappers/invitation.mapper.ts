@@ -1,18 +1,17 @@
 import { Invitation, InvitationStatus, InvitationSummary } from '../../domain/entities';
-import { InvitationResponseDto, InvitationSummaryResponseDto, CreateInvitationRequestDto } from '../dtos';
+import { InvitationResponseDto, InvitationSummaryResponseDto, InvitationCreateRequestDto } from '../dtos';
 import { CreateInvitationData } from '../../domain/repositories';
 
 export class InvitationMapper {
     static fromResponse(response: InvitationResponseDto): Invitation {
         return {
             id: response.id,
+            inviterRoomieId: response.inviterRoomieId,
             inviteeEmail: response.inviteeEmail,
             houseId: response.houseId,
-            houseName: response.houseName,
-            inviterName: response.inviterName,
             status: response.status as InvitationStatus,
             createdAt: new Date(response.createdAt),
-            updatedAt: new Date(response.updatedAt)
+            respondedAt: response.respondedAt ? new Date(response.respondedAt) : undefined
         };
     }
 
@@ -27,7 +26,7 @@ export class InvitationMapper {
         };
     }
 
-    static toCreateRequest(data: CreateInvitationData): CreateInvitationRequestDto {
+    static toCreateRequest(data: CreateInvitationData): InvitationCreateRequestDto {
         return {
             inviteeEmail: data.inviteeEmail,
             houseId: data.houseId

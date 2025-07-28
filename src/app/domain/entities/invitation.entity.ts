@@ -1,12 +1,11 @@
 export interface Invitation {
     id: number;
+    inviterRoomieId: number;
     inviteeEmail: string;
     houseId: number;
-    houseName?: string;
-    inviterName?: string;
     status: InvitationStatus;
     createdAt: Date;
-    updatedAt: Date;
+    respondedAt?: Date;
 }
 
 export enum InvitationStatus {

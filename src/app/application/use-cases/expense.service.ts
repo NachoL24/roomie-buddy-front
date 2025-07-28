@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ExpenseRepository, CreateExpenseData, UpdateExpenseData } from '../../domain/repositories';
-import { Expense, ExpenseSummary } from '../../domain/entities';
+import { HouseExpense, ExpenseSummary } from '../../domain/entities';
 import { ExpenseValidator } from '../validators/expense.validator';
 import { CreateExpenseRequest, ExpenseSplitType } from '../dto/expense.dto';
 import { BusinessValidationError, ExternalServiceError } from '../exceptions/business-validation.error';
@@ -19,7 +19,7 @@ export class ExpenseService {
   /**
    * Crea un gasto con validación de reglas de negocio
    */
-  createExpenseWithValidation(request: CreateExpenseRequest, houseMemberIds: number[]): Observable<Expense> {
+  createExpenseWithValidation(request: CreateExpenseRequest, houseMemberIds: number[]): Observable<HouseExpense> {
     try {
       // Validar reglas de negocio
       this.expenseValidator.validateCreateExpense(request);
@@ -42,27 +42,27 @@ export class ExpenseService {
   /**
    * Método básico para crear gastos (sin validación adicional)
    */
-  createExpense(expenseData: CreateExpenseData): Observable<Expense> {
+  createExpense(expenseData: CreateExpenseData): Observable<HouseExpense> {
     return this.expenseRepository.createExpense(expenseData);
   }
 
-  getExpenseById(id: number): Observable<Expense> {
+  getExpenseById(id: number): Observable<HouseExpense> {
     return this.expenseRepository.getExpenseById(id);
   }
 
-  getHouseExpenses(houseId: number, startDate?: string, endDate?: string): Observable<Expense[]> {
+  getHouseExpenses(houseId: number, startDate?: string, endDate?: string): Observable<HouseExpense[]> {
     return this.expenseRepository.getExpensesByHouse(houseId, startDate, endDate);
   }
 
-  getMyExpenses(roomieId: number): Observable<Expense[]> {
+  getMyExpenses(roomieId: number): Observable<HouseExpense[]> {
     return this.expenseRepository.getExpensesByRoomie(roomieId);
   }
 
-  getHouseExpenseSummary(houseId: number): Observable<ExpenseSummary> {
+  getHouseExpenseSummary(houseId: number): Observable<ExpenseSummary[]> {
     return this.expenseRepository.getExpenseSummaryByHouse(houseId);
   }
 
-  updateExpense(id: number, expenseData: UpdateExpenseData): Observable<Expense> {
+  updateExpense(id: number, expenseData: UpdateExpenseData): Observable<HouseExpense> {
     return this.expenseRepository.updateExpense(id, expenseData);
   }
 
@@ -77,9 +77,9 @@ export class ExpenseService {
     description: string,
     amount: number,
     houseId: number,
-    paidByRoomieId: number,
+    paidById: number,
     members: { roomieId: number; payRatio: number }[]
-  ): Observable<Expense> {
+  ): Observable<HouseExpense> {
     const expenseShares = members.map(member => ({
       roomieId: member.roomieId,
       shareAmount: Math.round(amount * member.payRatio)
@@ -88,8 +88,9 @@ export class ExpenseService {
     const expenseData: CreateExpenseData = {
       description,
       amount,
+      date: new Date(),
       houseId,
-      paidByRoomieId,
+      paidById,
       expenseShares
     };
 
@@ -103,9 +104,9 @@ export class ExpenseService {
     description: string,
     amount: number,
     houseId: number,
-    paidByRoomieId: number,
+    paidById: number,
     memberIds: number[]
-  ): Observable<Expense> {
+  ): Observable<HouseExpense> {
     const shareAmount = Math.round(amount / memberIds.length);
     const expenseShares = memberIds.map(roomieId => ({
       roomieId,
@@ -115,8 +116,9 @@ export class ExpenseService {
     const expenseData: CreateExpenseData = {
       description,
       amount,
+      date: new Date(),
       houseId,
-      paidByRoomieId,
+      paidById,
       expenseShares
     };
 
@@ -146,8 +148,9 @@ export class ExpenseService {
     return {
       description: request.description,
       amount: request.amount,
+      date: new Date(),
       houseId: request.houseId,
-      paidByRoomieId: request.paidByRoomieId,
+      paidById: request.paidByRoomieId,
       expenseShares
     };
   }

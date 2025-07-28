@@ -1,18 +1,17 @@
 // Invitation DTOs
-export interface CreateInvitationRequestDto {
+export interface InvitationCreateRequestDto {
   inviteeEmail: string;
   houseId: number;
 }
 
 export interface InvitationResponseDto {
   id: number;
+  inviterRoomieId: number;
   inviteeEmail: string;
   houseId: number;
-  houseName?: string;
-  inviterName?: string;
-  status: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED';
   createdAt: string;
-  updatedAt: string;
+  respondedAt?: string;
 }
 
 export interface InvitationSummaryResponseDto {
@@ -23,3 +22,6 @@ export interface InvitationSummaryResponseDto {
   acceptedSent: number;
   acceptedReceived: number;
 }
+
+// Legacy DTOs (for backward compatibility)
+export interface CreateInvitationRequestDto extends InvitationCreateRequestDto { }

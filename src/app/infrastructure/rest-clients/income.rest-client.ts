@@ -26,12 +26,16 @@ export class IncomeRestClient extends IncomeRepository {
     }
 
     getIncomesByHouse(houseId: number, startDate?: string, endDate?: string): Observable<Income[]> {
-        let params = new HttpParams();
-        if (startDate) params = params.set('startDate', startDate);
-        if (endDate) params = params.set('endDate', endDate);
-
-        return this.http.get<IncomeResponseDto[]>(`${this.apiBaseUrl}/incomes/house/${houseId}/date-range`, { params })
-            .pipe(map(incomes => incomes.map(IncomeMapper.fromResponse)));
+        if (startDate && endDate) {
+            let params = new HttpParams()
+                .set('startDate', startDate)
+                .set('endDate', endDate);
+            return this.http.get<IncomeResponseDto[]>(`${this.apiBaseUrl}/incomes/house/${houseId}/date-range`, { params })
+                .pipe(map(incomes => incomes.map(IncomeMapper.fromResponse)));
+        } else {
+            return this.http.get<IncomeResponseDto[]>(`${this.apiBaseUrl}/incomes/house/${houseId}`)
+                .pipe(map(incomes => incomes.map(IncomeMapper.fromResponse)));
+        }
     }
 
     getMyIncomes(): Observable<Income[]> {
@@ -40,9 +44,9 @@ export class IncomeRestClient extends IncomeRepository {
     }
 
     getFinancialSummary(params: FinancialSummaryParams): Observable<FinancialSummary> {
-        let httpParams = new HttpParams()
-            .set('period', params.period);
+        let httpParams = new HttpParams();
 
+        if (params.period) httpParams = httpParams.set('period', params.period);
         if (params.startDate) httpParams = httpParams.set('startDate', params.startDate);
         if (params.endDate) httpParams = httpParams.set('endDate', params.endDate);
 

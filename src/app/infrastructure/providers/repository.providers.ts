@@ -4,6 +4,8 @@ import {
   HouseRepository,
   InvitationRepository,
   ExpenseRepository,
+  HouseExpenseRepository,
+  PersonalExpenseRepository,
   IncomeRepository,
   SettlementRepository
 } from '../../domain/repositories';
@@ -12,6 +14,8 @@ import {
   HouseRestClient,
   InvitationRestClient,
   ExpenseRestClient,
+  HouseExpenseRestClient,
+  PersonalExpenseRestClient,
   IncomeRestClient,
   SettlementRestClient
 } from '../rest-clients';
@@ -36,6 +40,14 @@ export const REPOSITORY_PROVIDERS: Provider[] = [
   {
     provide: ExpenseRepository,
     useClass: ExpenseRestClient
+  },
+  {
+    provide: HouseExpenseRepository,
+    useClass: HouseExpenseRestClient
+  },
+  {
+    provide: PersonalExpenseRepository,
+    useClass: PersonalExpenseRestClient
   },
   {
     provide: IncomeRepository,

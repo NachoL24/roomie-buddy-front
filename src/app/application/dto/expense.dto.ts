@@ -8,7 +8,7 @@ export interface CreateExpenseRequest {
   description: string;
   amount: number;
   houseId: number;
-  paidByRoomieId: number;
+  paidByRoomieId: number; // Keep legacy field name for backward compatibility
   splitType: ExpenseSplitType;
   customShares?: CustomShare[];
 }

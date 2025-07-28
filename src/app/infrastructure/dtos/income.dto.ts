@@ -1,18 +1,18 @@
 // Income DTOs
-export interface CreateIncomeRequestDto {
+export interface IncomeCreateRequestDto {
     description: string;
     amount: number;
-    houseId: number;
-    isRecurring: boolean;
-    recurrenceFrequency?: string;
-    earnedAt: string;
+    houseId?: number;
+    isRecurring?: boolean;
+    recurrenceFrequency?: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+    earnedAt?: string;
 }
 
-export interface UpdateIncomeRequestDto {
+export interface IncomeUpdateRequestDto {
     description?: string;
     amount?: number;
     isRecurring?: boolean;
-    recurrenceFrequency?: string;
+    recurrenceFrequency?: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
     earnedAt?: string;
 }
 
@@ -20,11 +20,11 @@ export interface IncomeResponseDto {
     id: number;
     description: string;
     amount: number;
-    houseId: number;
-    roomieId: number;
-    roomieName?: string;
+    earnedById: number;
+    houseId?: number;
     isRecurring: boolean;
     recurrenceFrequency?: string;
+    nextRecurrenceDate?: string;
     earnedAt: string;
     createdAt: string;
 }
@@ -37,16 +37,16 @@ export interface FinancialSummaryResponseDto {
     periodType: string;
     startDate: string;
     endDate: string;
-    topIncomeDescriptions: IncomeCategoryResponseDto[];
-    topExpenseDescriptions: TopExpenseCategoryResponseDto[];
+    topIncomeDescriptions: TopItemDto[];
+    topExpenseDescriptions: TopItemDto[];
 }
 
-export interface IncomeCategoryResponseDto {
+export interface TopItemDto {
     description: string;
     amount: number;
 }
 
-export interface TopExpenseCategoryResponseDto {
-    description: string;
-    amount: number;
-}
+// Legacy DTOs (for backward compatibility)
+export interface CreateIncomeRequestDto extends IncomeCreateRequestDto { }
+export interface IncomeCategoryResponseDto extends TopItemDto { }
+export interface TopExpenseCategoryResponseDto extends TopItemDto { }

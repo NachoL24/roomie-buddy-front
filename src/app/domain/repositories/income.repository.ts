@@ -4,10 +4,10 @@ import { Income, FinancialSummary, RecurrenceFrequency, PeriodType } from '../..
 export interface CreateIncomeData {
     description: string;
     amount: number;
-    houseId: number;
-    isRecurring: boolean;
+    houseId?: number;
+    isRecurring?: boolean;
     recurrenceFrequency?: RecurrenceFrequency;
-    earnedAt: Date;
+    earnedAt?: Date;
 }
 
 export interface UpdateIncomeData {
@@ -20,7 +20,7 @@ export interface UpdateIncomeData {
 
 export interface FinancialSummaryParams {
     houseId: number;
-    period: PeriodType;
+    period?: PeriodType;
     startDate?: string;
     endDate?: string;
 }

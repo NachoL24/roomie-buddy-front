@@ -2,11 +2,11 @@ export interface Income {
     id: number;
     description: string;
     amount: number;
-    houseId: number;
-    roomieId: number;
-    roomieName?: string;
+    earnedById: number;
+    houseId?: number;
     isRecurring: boolean;
     recurrenceFrequency?: RecurrenceFrequency;
+    nextRecurrenceDate?: Date;
     earnedAt: Date;
     createdAt: Date;
 }
@@ -27,8 +27,8 @@ export interface FinancialSummary {
     periodType: PeriodType;
     startDate: Date;
     endDate: Date;
-    topIncomeDescriptions: IncomeCategory[];
-    topExpenseDescriptions: TopExpenseCategory[];
+    topIncomeDescriptions: TopIncomeItem[];
+    topExpenseDescriptions: TopExpenseItem[];
 }
 
 export enum PeriodType {
@@ -38,12 +38,16 @@ export enum PeriodType {
     CUSTOM = 'CUSTOM'
 }
 
-export interface IncomeCategory {
+export interface TopIncomeItem {
     description: string;
     amount: number;
 }
 
-export interface TopExpenseCategory {
+export interface TopExpenseItem {
     description: string;
     amount: number;
 }
+
+// Legacy support (will be deprecated)
+export interface IncomeCategory extends TopIncomeItem { }
+export interface TopExpenseCategory extends TopExpenseItem { }

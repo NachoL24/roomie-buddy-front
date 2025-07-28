@@ -5,3 +5,6 @@ export * from './invitation.repository';
 export * from './expense.repository';
 export * from './income.repository';
 export * from './settlement.repository';
+
+// Export new repository interfaces
+export { HouseExpenseRepository, PersonalExpenseRepository } from './expense.repository';
