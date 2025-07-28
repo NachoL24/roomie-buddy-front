@@ -4,10 +4,11 @@ import { AuthService } from '@auth0/auth0-angular';
 import { API_BASE_URL, Auth0Config, auth0Config } from './app.config';
 import { firstValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { CreateExpenseComponent } from "@presentation/components/create-expense.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CreateExpenseComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
