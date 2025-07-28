@@ -1,9 +1,9 @@
 import { Invitation, InvitationStatus, InvitationSummary } from '../../domain/entities';
-import { InvitationResponse, InvitationSummaryResponse, CreateInvitationRequest } from '../dtos';
+import { InvitationResponseDto, InvitationSummaryResponseDto, CreateInvitationRequestDto } from '../dtos';
 import { CreateInvitationData } from '../../domain/repositories';
 
 export class InvitationMapper {
-    static fromResponse(response: InvitationResponse): Invitation {
+    static fromResponse(response: InvitationResponseDto): Invitation {
         return {
             id: response.id,
             inviteeEmail: response.inviteeEmail,
@@ -16,7 +16,7 @@ export class InvitationMapper {
         };
     }
 
-    static summaryFromResponse(response: InvitationSummaryResponse): InvitationSummary {
+    static summaryFromResponse(response: InvitationSummaryResponseDto): InvitationSummary {
         return {
             totalSent: response.totalSent,
             totalReceived: response.totalReceived,
@@ -27,7 +27,7 @@ export class InvitationMapper {
         };
     }
 
-    static toCreateRequest(data: CreateInvitationData): CreateInvitationRequest {
+    static toCreateRequest(data: CreateInvitationData): CreateInvitationRequestDto {
         return {
             inviteeEmail: data.inviteeEmail,
             houseId: data.houseId

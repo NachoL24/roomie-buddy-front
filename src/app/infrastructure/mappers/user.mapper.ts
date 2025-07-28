@@ -1,8 +1,8 @@
 import { User } from '../../domain/entities';
-import { UserResponse, CreateUserRequest, UpdateUserRequest } from '../dtos';
+import { UserResponseDto, CreateUserRequestDto, UpdateUserRequestDto } from '../dtos';
 
 export class UserMapper {
-    static fromResponse(response: UserResponse): User {
+    static fromResponse(response: UserResponseDto): User {
         return {
             id: response.id,
             auth0Sub: response.auth0Sub,
@@ -13,14 +13,14 @@ export class UserMapper {
         };
     }
 
-    static toCreateRequest(user: Partial<User>): CreateUserRequest {
+    static toCreateRequest(user: Partial<User>): CreateUserRequestDto {
         return {
             firstName: user.firstName!,
             lastName: user.lastName!
         };
     }
 
-    static toUpdateRequest(user: Partial<User>): UpdateUserRequest {
+    static toUpdateRequest(user: Partial<User>): UpdateUserRequestDto {
         return {
             firstName: user.firstName,
             lastName: user.lastName

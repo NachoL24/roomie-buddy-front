@@ -7,17 +7,17 @@ import {
     TopExpenseCategory
 } from '../../domain/entities';
 import {
-    IncomeResponse,
-    FinancialSummaryResponse,
-    IncomeCategoryResponse,
-    TopExpenseCategoryResponse,
-    CreateIncomeRequest,
-    UpdateIncomeRequest
+    IncomeResponseDto,
+    FinancialSummaryResponseDto,
+    IncomeCategoryResponseDto,
+    TopExpenseCategoryResponseDto,
+    CreateIncomeRequestDto,
+    UpdateIncomeRequestDto
 } from '../dtos';
 import { CreateIncomeData, UpdateIncomeData } from '../../domain/repositories';
 
 export class IncomeMapper {
-    static fromResponse(response: IncomeResponse): Income {
+    static fromResponse(response: IncomeResponseDto): Income {
         return {
             id: response.id,
             description: response.description,
@@ -32,7 +32,7 @@ export class IncomeMapper {
         };
     }
 
-    static financialSummaryFromResponse(response: FinancialSummaryResponse): FinancialSummary {
+    static financialSummaryFromResponse(response: FinancialSummaryResponseDto): FinancialSummary {
         return {
             totalIncome: response.totalIncome,
             totalExpenses: response.totalExpenses,
@@ -46,21 +46,21 @@ export class IncomeMapper {
         };
     }
 
-    static incomeCategoryFromResponse(response: IncomeCategoryResponse): IncomeCategory {
+    static incomeCategoryFromResponse(response: IncomeCategoryResponseDto): IncomeCategory {
         return {
             description: response.description,
             amount: response.amount
         };
     }
 
-    static topExpenseCategoryFromResponse(response: TopExpenseCategoryResponse): TopExpenseCategory {
+    static topExpenseCategoryFromResponse(response: TopExpenseCategoryResponseDto): TopExpenseCategory {
         return {
             description: response.description,
             amount: response.amount
         };
     }
 
-    static toCreateRequest(data: CreateIncomeData): CreateIncomeRequest {
+    static toCreateRequest(data: CreateIncomeData): CreateIncomeRequestDto {
         return {
             description: data.description,
             amount: data.amount,
@@ -71,7 +71,7 @@ export class IncomeMapper {
         };
     }
 
-    static toUpdateRequest(data: UpdateIncomeData): UpdateIncomeRequest {
+    static toUpdateRequest(data: UpdateIncomeData): UpdateIncomeRequestDto {
         return {
             description: data.description,
             amount: data.amount,

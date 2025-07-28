@@ -1,16 +1,16 @@
 import { Expense, ExpenseShare, ExpenseSummary, ExpenseCategory } from '../../domain/entities';
 import {
-    ExpenseResponse,
-    ExpenseShareResponse,
-    ExpenseSummaryResponse,
-    ExpenseCategoryResponse,
-    CreateExpenseRequest,
-    UpdateExpenseRequest
+    ExpenseResponseDto,
+    ExpenseShareResponseDto,
+    ExpenseSummaryResponseDto,
+    ExpenseCategoryResponseDto,
+    CreateExpenseRequestDto,
+    UpdateExpenseRequestDto
 } from '../dtos';
 import { CreateExpenseData, UpdateExpenseData } from '../../domain/repositories';
 
 export class ExpenseMapper {
-    static fromResponse(response: ExpenseResponse): Expense {
+    static fromResponse(response: ExpenseResponseDto): Expense {
         return {
             id: response.id,
             description: response.description,
@@ -23,7 +23,7 @@ export class ExpenseMapper {
         };
     }
 
-    static shareFromResponse(response: ExpenseShareResponse): ExpenseShare {
+    static shareFromResponse(response: ExpenseShareResponseDto): ExpenseShare {
         return {
             id: response.id,
             roomieId: response.roomieId,
@@ -32,7 +32,7 @@ export class ExpenseMapper {
         };
     }
 
-    static summaryFromResponse(response: ExpenseSummaryResponse): ExpenseSummary {
+    static summaryFromResponse(response: ExpenseSummaryResponseDto): ExpenseSummary {
         return {
             totalExpenses: response.totalExpenses,
             expenseCount: response.expenseCount,
@@ -41,14 +41,14 @@ export class ExpenseMapper {
         };
     }
 
-    static categoryFromResponse(response: ExpenseCategoryResponse): ExpenseCategory {
+    static categoryFromResponse(response: ExpenseCategoryResponseDto): ExpenseCategory {
         return {
             description: response.description,
             amount: response.amount
         };
     }
 
-    static toCreateRequest(data: CreateExpenseData): CreateExpenseRequest {
+    static toCreateRequest(data: CreateExpenseData): CreateExpenseRequestDto {
         return {
             description: data.description,
             amount: data.amount,
@@ -61,7 +61,7 @@ export class ExpenseMapper {
         };
     }
 
-    static toUpdateRequest(data: UpdateExpenseData): UpdateExpenseRequest {
+    static toUpdateRequest(data: UpdateExpenseData): UpdateExpenseRequestDto {
         return {
             description: data.description,
             amount: data.amount,

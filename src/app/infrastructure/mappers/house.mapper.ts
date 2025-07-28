@@ -1,9 +1,9 @@
 import { House, HouseMember } from '../../domain/entities';
-import { HouseResponse, HouseMemberResponse, CreateHouseRequest, UpdateHouseNameRequest, UpdatePayRatiosRequest } from '../dtos';
+import { HouseResponseDto, HouseMemberResponseDto, CreateHouseRequestDto, UpdateHouseNameRequestDto, UpdatePayRatiosRequestDto } from '../dtos';
 import { PayRatioUpdate } from '../../domain/repositories';
 
 export class HouseMapper {
-    static fromResponse(response: HouseResponse): House {
+    static fromResponse(response: HouseResponseDto): House {
         return {
             id: response.id,
             name: response.name,
@@ -12,7 +12,7 @@ export class HouseMapper {
         };
     }
 
-    static memberFromResponse(response: HouseMemberResponse): HouseMember {
+    static memberFromResponse(response: HouseMemberResponseDto): HouseMember {
         return {
             id: response.id,
             firstName: response.firstName,
@@ -21,15 +21,15 @@ export class HouseMapper {
         };
     }
 
-    static toCreateRequest(name: string): CreateHouseRequest {
+    static toCreateRequest(name: string): CreateHouseRequestDto {
         return { name };
     }
 
-    static toUpdateNameRequest(name: string): UpdateHouseNameRequest {
+    static toUpdateNameRequest(name: string): UpdateHouseNameRequestDto {
         return { name };
     }
 
-    static toUpdatePayRatiosRequest(payRatios: PayRatioUpdate[]): UpdatePayRatiosRequest {
+    static toUpdatePayRatiosRequest(payRatios: PayRatioUpdate[]): UpdatePayRatiosRequestDto {
         return { payRatios };
     }
 }
