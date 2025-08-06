@@ -4,5 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  createdAt: Date;
+  doc?: string;
+  pic?: string;
+  profileCompleted: boolean;
 }

@@ -1,5 +1,5 @@
-import { House, HouseMember } from '../../domain/entities';
-import { HouseResponseDto, HouseMemberResponseDto, CreateHouseRequestDto, UpdateHouseNameRequestDto, UpdatePayRatiosRequestDto } from '../dtos';
+import { House, HouseMember, HouseMinimal } from '../../domain/entities';
+import { HouseResponseDto, HouseMemberResponseDto, CreateHouseRequestDto, UpdateHouseNameRequestDto, UpdatePayRatiosRequestDto, HouseMinimalResponseDto } from '../dtos';
 import { PayRatioUpdate } from '../../domain/repositories';
 
 export class HouseMapper {
@@ -9,6 +9,13 @@ export class HouseMapper {
             name: response.name,
             createdAt: new Date(response.createdAt),
             members: response.members.map(this.memberFromResponse)
+        };
+    }
+
+    static fromResponseMinimal(response: HouseMinimalResponseDto): HouseMinimal {
+        return {
+            id: response.id,
+            name: response.name
         };
     }
 

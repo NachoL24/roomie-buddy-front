@@ -7,3 +7,5 @@ export * from './house-expense.service';
 export * from './personal-expense.service';
 export * from './income.service';
 export * from './settlement.service';
+export * from './auth.service';
+export * from './global-user.service';

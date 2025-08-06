@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { House, HouseMember } from '../../domain/entities';
+import { House, HouseMember, HouseMinimal } from '../../domain/entities';
 
 export interface PayRatioUpdate {
     roomieId: number;
@@ -8,7 +8,7 @@ export interface PayRatioUpdate {
 
 export abstract class HouseRepository {
     abstract getHouseById(id: number): Observable<House>;
-    abstract getHousesByRoomie(roomieId: number): Observable<House[]>;
+    abstract getHousesByRoomie(roomieId: number): Observable<HouseMinimal[]>;
     abstract createHouse(name: string): Observable<House>;
     abstract updateHouseName(houseId: number, name: string): Observable<House>;
     abstract updatePayRatios(houseId: number, payRatios: PayRatioUpdate[]): Observable<void>;

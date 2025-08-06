@@ -1,0 +1,10 @@
+.active,
+.theme-option:hover {
+  background-color: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.active mat-icon,
+.theme-option:hover mat-icon {
+  color: var(--mat-sys-on-secondary-container);
+}

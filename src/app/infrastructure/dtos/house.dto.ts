@@ -23,6 +23,11 @@ export interface HouseResponseDto {
     members: HouseMemberResponseDto[];
 }
 
+export interface HouseMinimalResponseDto {
+    id: number;
+    name: string;
+}
+
 export interface HouseMemberResponseDto {
     id: number;
     firstName: string;

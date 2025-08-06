@@ -1,12 +1,24 @@
 import { Routes } from '@angular/router';
+import { userReadyResolver } from '@presentation/shared/guards/userLoadedResolver';
+import { DashboardComponent } from './presentation/pages/dashboard/dashboard.component';
+import { HomepageComponent } from '@presentation/pages/homepage/homepage.component';
+import { AuthGuard } from '@auth0/auth0-angular';
 
 export const routes: Routes = [
-    {
-        path: '',
-        loadComponent: () => import('./presentation/pages/homepage/homepage.component').then(m => m.HomepageComponent)
+  {
+    path: '',
+    component: HomepageComponent
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    resolve: {
+      user: userReadyResolver
     },
-    {
-        path: '**',
-        redirectTo: ''
-    }
+    canActivate: [AuthGuard]
+  },
+  {
+    path: '**',
+    redirectTo: ''
+  }
 ];

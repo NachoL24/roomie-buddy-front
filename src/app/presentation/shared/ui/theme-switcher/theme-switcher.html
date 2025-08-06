@@ -1,0 +1,29 @@
+<button
+  mat-menu-item
+  (click)="setTheme('light')"
+  [class.active]="themeService.theme() === 'light'"
+  class="theme-option"
+>
+  <mat-icon>light_mode</mat-icon>
+  <span>Modo claro</span>
+</button>
+
+<button
+  mat-menu-item
+  (click)="setTheme('dark')"
+  [class.active]="themeService.theme() === 'dark'"
+  class="theme-option"
+>
+  <mat-icon>dark_mode</mat-icon>
+  <span>Modo oscuro</span>
+</button>
+
+<button
+  mat-menu-item
+  (click)="setTheme('system')"
+  [class.active]="themeService.theme() === 'system'"
+  class="theme-option"
+>
+  <mat-icon>settings_suggest</mat-icon>
+  <span>Sistema</span>
+</button>
