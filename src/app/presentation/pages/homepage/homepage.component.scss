@@ -73,11 +73,11 @@
 
 .characteristics-section,
 .pricing-section {
-  padding: 38px 24px;
+  min-height: 80vh;
+  margin: 80px 0;
+  padding: 10px 0;
 
   .section-content {
-    max-width: 1200px;
-    margin: 0 auto;
 
     .section-title {
       font-size: 2.5rem;
@@ -187,26 +187,31 @@
       }
 
       mat-card-header {
+        padding-top: 5px;
         margin-bottom: 24px;
 
         mat-card-title {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #333;
+          text-align: start;
         }
 
         mat-card-subtitle {
           font-size: 2rem;
           font-weight: 700;
           color: #7b1fa2;
-          margin-top: 8px;
+          margin-top: 12px;
         }
+      }
+
+      mat-card-content {
+        padding-bottom: 0;
       }
 
       .plan-btn {
         width: 100%;
         padding: 12px;
-        margin-bottom: 24px;
+        margin-bottom: 12px;
         border-radius: 8px;
         font-weight: 600;
       }
@@ -219,8 +224,8 @@
         li {
           display: flex;
           align-items: center;
-          margin-bottom: 12px;
-          color: #666;
+          font-size: 1.1rem;
+          margin-bottom: 6px;
 
           mat-icon {
             color: #4caf50;
@@ -242,14 +247,5 @@
 
   .pricing-card.premium-plan {
     transform: none;
-  }
-
-  .hero-section {
-    padding: 0 16px;
-  }
-
-  .characteristics-section,
-  .pricing-section {
-    padding: 60px 16px;
   }
 }
