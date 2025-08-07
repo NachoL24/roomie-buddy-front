@@ -1,5 +1,11 @@
 <!-- Hero Section -->
-<section class="hero-section">
+<section
+  [ngClass]="{
+    'hero-section': true,
+    'back-ground-image-dark-theme': theme.resolvedTheme() == 'dark',
+    'back-ground-image-light-theme': theme.resolvedTheme() == 'light'
+  }"
+>
   <div class="hero-content">
     <div class="hero-text">
       <h1 class="hero-title">Administra tus finanzas con RoomieBuddy</h1>
@@ -8,7 +14,7 @@
         finanzas con facilidad. Es simple, intuitivo y potente.
       </p>
       <button
-        mat-raised-button
+        mat-flat-button
         color="primary"
         class="get-started-btn"
         (click)="onGetStarted()"

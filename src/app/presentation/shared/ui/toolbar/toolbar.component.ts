@@ -23,7 +23,10 @@ import { ThemeSwitcherComponent } from "../theme-switcher/theme-switcher";
       @if (globalUser.isLoggedIn()) {
         <app-user-menu/>
       } @else {
-        <button class="login-button" mat-flat-button (click)="auth.login()">Iniciar sesión</button>
+        <button class="login-button" mat-flat-button (click)="auth.login()">
+          <mat-icon>login</mat-icon>
+          Iniciar sesión
+        </button>
         <button mat-icon-button [matMenuTriggerFor]="menu">
           <mat-icon>{{ theme.resolvedTheme() }}_mode</mat-icon>
           <mat-menu #menu="matMenu">

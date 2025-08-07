@@ -1,51 +1,22 @@
-// Homepage Styles
-
-.homepage-toolbar {
-  background: rgba(255, 255, 255, 0.95);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  z-index: 100;
-  width: 100%;
-
-  .toolbar-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
-
-    .logo-section {
-      .logo-text {
-        font-size: 24px;
-        font-weight: 600;
-        color: #7b1fa2;
-      }
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-
-      button {
-        font-weight: 500;
-      }
-    }
-  }
-}
-
-.hero-section {
-  min-height: 100vh;
+.back-ground-image-light-theme {
   background-image: linear-gradient(
       rgba(139, 69, 19, 0.3),
       rgba(139, 69, 19, 0.3)
     ),
     url("/assets/home-background.png");
+}
+
+.back-ground-image-dark-theme {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("/assets/home-background.png");
+}
+
+.hero-section {
+  height: 80vh;
+  width: 100%;
+  border-radius: 12px;
+  align-self: center;
+  justify-self: center;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -53,7 +24,6 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  margin-top: 64px; // Account for fixed toolbar
 
   .hero-content {
     max-width: 1200px;
@@ -91,16 +61,10 @@
       .get-started-btn {
         font-size: 1.1rem;
         padding: 12px 32px;
-        border-radius: 25px;
-        background-color: #7b1fa2;
-        color: white;
-        box-shadow: 0 4px 12px rgba(123, 31, 162, 0.3);
         transition: all 0.3s ease;
 
         &:hover {
-          background-color: #6a1b9a;
           transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(123, 31, 162, 0.4);
         }
       }
     }
@@ -109,8 +73,7 @@
 
 .characteristics-section,
 .pricing-section {
-  padding: 80px 24px;
-  background-color: #fafafa;
+  padding: 32px 24px;
 
   .section-content {
     max-width: 1200px;
@@ -121,7 +84,6 @@
       font-weight: 700;
       text-align: center;
       margin-bottom: 16px;
-      color: #333;
     }
 
     .section-subtitle {
@@ -129,14 +91,12 @@
       font-weight: 600;
       text-align: center;
       margin-bottom: 16px;
-      color: #555;
     }
 
     .section-description {
       font-size: 1.1rem;
       text-align: center;
       margin-bottom: 48px;
-      color: #666;
       max-width: 800px;
       margin-left: auto;
       margin-right: auto;
@@ -148,7 +108,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
-  margin-top: 48px;
 
   .feature-card {
     padding: 24px;
@@ -165,10 +124,7 @@
       margin-bottom: 16px;
 
       mat-icon {
-        background-color: #7b1fa2;
-        color: white;
-        border-radius: 50%;
-        padding: 8px;
+        color: var(--mat-sys-primary);
       }
 
       mat-card-title {
@@ -185,8 +141,6 @@
 }
 
 .pricing-section {
-  background-color: white;
-
   .pricing-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
