@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '@application/use-cases';
-import { ThemeService, NavigationService } from '@presentation/shared/services';
+import { ThemeService, NavigationService, LoadingService } from '@presentation/shared/services';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./homepage.component.scss']
 })
 export class HomepageComponent implements OnInit, OnDestroy {
-
+  private loadingService = inject(LoadingService);
   theme = inject(ThemeService);
   navigationService = inject(NavigationService);
   private subscription = new Subscription();

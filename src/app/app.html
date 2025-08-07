@@ -1,4 +1,8 @@
+@if (loadingService.isLoading()) {
+<app-loading />
+} @else {
 <app-toolbar />
 <div class="page-container">
   <router-outlet />
 </div>
+}

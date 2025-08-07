@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, of, switchMap, tap } from 'rxjs';
 import { User } from '../../domain/entities';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserRepository } from '../../domain/repositories';
+import { LoadingService } from '@presentation/shared/services';
 
 @Injectable({
   providedIn: 'root'

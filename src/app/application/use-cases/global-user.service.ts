@@ -6,7 +6,7 @@ import { UserRepository } from '../../domain/repositories';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class GlobalUserService {
   // estado
@@ -45,7 +45,7 @@ export class GlobalUserService {
       });
   }
 
-    loadOnce$() {
+  loadOnce$() {
     // no vuelvas a pedir si ya está listo
     if (this.ready()) return of(this.user());
     this.ensureLoaded();

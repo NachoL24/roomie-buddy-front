@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToolbarComponent } from "@presentation/shared/ui/toolbar/toolbar.component";
+import { LoadingComponent } from "@presentation/shared/ui/loading/loading.component";
+import { LoadingService } from "@presentation/shared/services";
+import { CommonModule } from '@angular/common';
+import { GlobalUserService } from '@application/use-cases';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToolbarComponent],
+  imports: [RouterOutlet, ToolbarComponent, LoadingComponent, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
   protected title = 'roomie-buddy-front';
+  loadingService = inject(LoadingService);
+
 }
