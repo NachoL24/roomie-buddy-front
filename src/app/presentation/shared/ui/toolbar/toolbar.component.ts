@@ -70,7 +70,7 @@ import { CommonModule } from "@angular/common";
 
     .nav-button {
       margin-right: 16px;
-      color: white;
+      color: var(--mat-sys-primary) !important;
       font-weight: 500;
 
       @media (max-width: 650px) {

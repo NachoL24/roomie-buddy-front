@@ -1,14 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { Router } from '@angular/router';
-import { AuthenticationService, GlobalUserService } from '@application/use-cases';
-import { User } from '@domain/entities';
-import { ToolbarComponent } from '@presentation/shared/ui/toolbar/toolbar.component';
+import { GlobalUserService } from '@application/use-cases';
 
 @Component({
   selector: 'app-homepage',
@@ -19,11 +16,9 @@ import { ToolbarComponent } from '@presentation/shared/ui/toolbar/toolbar.compon
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatGridListModule,
-    ToolbarComponent
+    MatGridListModule
   ],
   template: `
-    <app-toolbar/>
     <mat-card>
       <mat-card-header>
         <mat-card-title>Welcome to the Homepage</mat-card-title>

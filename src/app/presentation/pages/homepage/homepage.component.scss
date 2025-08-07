@@ -169,7 +169,7 @@
       }
 
       &.premium-plan {
-        border: 2px solid #7b1fa2;
+        border: 2px solid var(--mat-sys-inverse-primary);
         transform: scale(1.05);
 
         .popular-badge {
@@ -177,8 +177,8 @@
           top: -12px;
           left: 50%;
           transform: translateX(-50%);
-          background-color: #7b1fa2;
-          color: white;
+          background-color: var(--mat-sys-inverse-primary);
+          color: var(--mat-sys-on-primary-container);
           padding: 6px 16px;
           border-radius: 20px;
           font-size: 0.875rem;
@@ -199,7 +199,7 @@
         mat-card-subtitle {
           font-size: 2rem;
           font-weight: 700;
-          color: #7b1fa2;
+          color: var(--mat-sys-on-primary-fixed-variant);
           margin-top: 12px;
         }
       }
