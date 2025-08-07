@@ -4,10 +4,13 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { UserMenuComponent } from "../user-menu/user-menu";
 import { ThemeService } from "@presentation/shared/services";
+import { AuthenticationService, GlobalUserService } from "@application/use-cases";
+import { MatMenuModule } from "@angular/material/menu";
+import { ThemeSwitcherComponent } from "../theme-switcher/theme-switcher";
 
 @Component({
   selector: 'app-toolbar',
-  imports: [MatToolbarModule, MatButtonModule, MatIconModule, UserMenuComponent],
+  imports: [MatToolbarModule, MatButtonModule, MatIconModule, UserMenuComponent, MatMenuModule, ThemeSwitcherComponent],
   template: `
     <mat-toolbar color="primary">
       @if (theme.resolvedTheme() === 'dark') {
@@ -17,12 +20,26 @@ import { ThemeService } from "@presentation/shared/services";
       }
       <span class="title-text">Roomie Buddy</span>
       <span class="spacer"></span>
-      <app-user-menu/>
+      @if (globalUser.isLoggedIn()) {
+        <app-user-menu/>
+      } @else {
+        <button class="login-button" mat-flat-button (click)="auth.login()">Iniciar sesión</button>
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+          <mat-icon>{{ theme.resolvedTheme() }}_mode</mat-icon>
+          <mat-menu #menu="matMenu">
+            <app-theme-switcher/>
+        </mat-menu>
+        </button>
+      }
     </mat-toolbar>
   `,
   styles: [`
     .spacer {
       flex: 1 1 auto;
+    }
+
+    .login-button {
+      margin-right: 10px;
     }
 
     .logo {
@@ -41,10 +58,7 @@ import { ThemeService } from "@presentation/shared/services";
   `]
 })
 export class ToolbarComponent {
-
+  globalUser = inject(GlobalUserService);
+  auth = inject(AuthenticationService);
   theme = inject(ThemeService);
-
-  doSomeAction() {
-    console.log('Action performed');
-  }
 }
