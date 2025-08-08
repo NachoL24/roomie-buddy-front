@@ -61,7 +61,7 @@ import { MatButtonModule } from '@angular/material/button';
   styles: [`
 
     .drawer-nav {
-      padding: 0 12px;
+      padding: 0 6px 0 12px;
     }
 
     .new-house-button {

@@ -53,10 +53,9 @@ import { MatIconModule } from "@angular/material/icon";
   `,
   styles: [`
     :host {
-      margin-top: 16px;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-gap: 16px;
       gap: 24px;
       align-items: center;
       justify-content: center;
@@ -64,7 +63,7 @@ import { MatIconModule } from "@angular/material/icon";
 
     .card {
       padding: 2px 0;
-      width: 250px;
+      width: 100%;
       height: 110px;
     }
 
