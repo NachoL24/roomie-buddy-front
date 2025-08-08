@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { userReadyResolver } from '@presentation/shared/guards/userLoadedResolver';
 import { authGuard } from '@presentation/shared/guards/auth.guard';
-import { DashboardComponent } from './presentation/pages/dashboard/dashboard.component';
+import { MyDashboardComponent } from './presentation/pages/dashboard/my-dashboard.component';
 import { HomepageComponent } from '@presentation/pages/homepage/homepage.component';
 import { AuthCallbackComponent } from '@presentation/pages/auth-callback/auth-callback.component';
 
@@ -16,7 +16,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    component: MyDashboardComponent,
     resolve: {
       user: userReadyResolver
     },

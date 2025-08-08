@@ -38,9 +38,9 @@ export interface PersonalExpense {
 }
 
 export interface PersonalExpenseSummary {
-  totalExpenses: number;
-  expenseCount: number;
-  averageExpense: number;
+  MonthExpenses: number;
+  MonthIncome: number;
+  totalBalance: number;
 }
 
 // Top items for reports

@@ -72,9 +72,14 @@ export interface PersonalExpenseResponseDto {
 }
 
 export interface PersonalExpenseSummaryResponseDto {
-  totalExpenses: number;
+  currentMonthExpenses: number;
+  currentMonthIncome: number;
+  currentMonthBalance: number;
+  totalBalance: number;
+  periodStartDate: Date;
+  periodEndDate: Date;
   expenseCount: number;
-  averageExpense: number;
+  incomeCount: number;
 }
 
 // Legacy DTOs (for backward compatibility)
