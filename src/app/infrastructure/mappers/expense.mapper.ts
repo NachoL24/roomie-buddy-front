@@ -103,7 +103,7 @@ export class PersonalExpenseMapper {
     return {
       MonthExpenses: response.currentMonthExpenses,
       MonthIncome: response.currentMonthIncome,
-      totalBalance: response.currentMonthBalance,
+      totalBalance: response.totalBalance,
     };
   }
 
