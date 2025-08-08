@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { GlobalUserService } from '@application/use-cases';
 import { MyResumeComponent } from "./components/my-resume.ng";
 import { MyTransactionsComponent } from "./components/my-transactions.ng";
@@ -15,8 +15,8 @@ import { MyTransactionsComponent } from "./components/my-transactions.ng";
     <h1> Hola {{ userState.user()?.firstName }}! </h1>
     <p>Aquí puedes ver un resumen de tus finanzas</p>
   </div>
-    <app-my-resume/>
-    <app-my-transactions/>
+    <app-my-resume #myResume/>
+    <app-my-transactions [resumeComponent]="myResume"/>
   `,
   styles: [`
     :host {

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, OnInit, signal, Input } from "@angular/core";
 import { FinancialActivityService } from "@application/use-cases";
 import { FinancialActivity, FinancialActivityType } from "@domain/entities/financial-activity.entity";
 import { Page } from "@domain/entities/page.entity";
@@ -9,6 +9,7 @@ import { TransactionCardComponent } from '@presentation/shared/ui';
 import { MatButton, MatButtonModule } from "@angular/material/button";
 import { MatDialog } from "@angular/material/dialog";
 import { NewTransactionDialogComponent } from "./new-transaction-dialog.ng";
+import { MyResumeComponent } from "./my-resume.ng";
 
 @Component({
   selector: "app-my-transactions",
@@ -141,6 +142,8 @@ import { NewTransactionDialogComponent } from "./new-transaction-dialog.ng";
   `]
 })
 export class MyTransactionsComponent implements OnInit {
+  @Input() resumeComponent?: MyResumeComponent;
+
   activitiesService = inject(FinancialActivityService);
   dialog = inject(MatDialog);
   loading = signal(false);
@@ -186,8 +189,10 @@ export class MyTransactionsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Si se creó una transacción exitosamente, recargar la lista
+        // Recargar las transacciones
         this.loadFinancialActivities(this.page().page, this.page().pageSize);
+        // Actualizar el resumen directamente
+        this.resumeComponent?.loadExpenseSummary();
       }
     });
   }

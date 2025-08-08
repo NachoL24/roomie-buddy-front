@@ -101,6 +101,10 @@ export class MyResumeComponent implements OnInit {
   expenses = signal<PersonalExpenseSummary | null>(null);
 
   ngOnInit() {
+    this.loadExpenseSummary();
+  }
+
+  public loadExpenseSummary() {
     this.personalExpensesService.getPersonalExpenseSummary().subscribe(expenses => {
       console.log(expenses);
       this.expenses.set(expenses);
