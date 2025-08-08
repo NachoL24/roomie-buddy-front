@@ -8,7 +8,6 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { PersonalExpenseService } from "@application/use-cases/personal-expense.service";
 import { IncomeService } from "@application/use-cases/income.service";
 import { CreatePersonalExpenseData } from "@domain/repositories";
@@ -18,7 +17,6 @@ import { CreateIncomeData } from "@domain/repositories";
   selector: "app-new-transaction-dialog",
   standalone: true,
   imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule],
-  providers: [provideNativeDateAdapter()],
   template: `
     <h2>Nueva Transacción</h2>
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
