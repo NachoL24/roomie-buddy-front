@@ -177,10 +177,17 @@ export class MyTransactionsComponent implements OnInit {
   }
 
   newTransaction() {
-    this.dialog.open(NewTransactionDialogComponent, {
+    const dialogRef = this.dialog.open(NewTransactionDialogComponent, {
       width: '400px',
       data: {
         // Pass any data you need to the dialog here
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Si se creó una transacción exitosamente, recargar la lista
+        this.loadFinancialActivities(this.page().page, this.page().pageSize);
       }
     });
   }
