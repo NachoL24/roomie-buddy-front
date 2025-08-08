@@ -6,6 +6,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransactionCardComponent } from '@presentation/shared/ui';
+import { MatButton, MatButtonModule } from "@angular/material/button";
+import { MatDialog } from "@angular/material/dialog";
+import { NewTransactionDialogComponent } from "./new-transaction-dialog.ng";
 
 @Component({
   selector: "app-my-transactions",
@@ -14,11 +17,15 @@ import { TransactionCardComponent } from '@presentation/shared/ui';
     MatIconModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    TransactionCardComponent
+    TransactionCardComponent,
+    MatButtonModule
   ],
   template: `
     <div class="transactions-container">
+      <div class="transactions-header">
       <h1 class="title">Últimas Transacciones</h1>
+      <button matButton="filled" color="primary" (click)="newTransaction()">Nueva Transacción</button>
+      </div>
 
       @if (loading()) {
         <div class="loading-container">
@@ -61,10 +68,15 @@ import { TransactionCardComponent } from '@presentation/shared/ui';
       margin: 0 auto;
     }
 
+    .transactions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .title {
       font-size: 28px;
       font-weight: 500;
-      margin-bottom: 24px;
       color: var(--mat-sys-on-surface);
     }
 
@@ -130,6 +142,7 @@ import { TransactionCardComponent } from '@presentation/shared/ui';
 })
 export class MyTransactionsComponent implements OnInit {
   activitiesService = inject(FinancialActivityService);
+  dialog = inject(MatDialog);
   loading = signal(false);
   page = signal<Page<FinancialActivity>>({
     items: [],
@@ -141,10 +154,8 @@ export class MyTransactionsComponent implements OnInit {
     hasPreviousPage: false
   });
 
-  constructor() { }
-
   ngOnInit() {
-    this.loadFinancialActivities(1, 10);
+    this.loadFinancialActivities(this.page().page, this.page().pageSize);
   }
 
   onPageChange(event: PageEvent) {
@@ -161,6 +172,15 @@ export class MyTransactionsComponent implements OnInit {
       error: (error) => {
         console.error('Error fetching financial activities:', error);
         this.loading.set(false);
+      }
+    });
+  }
+
+  newTransaction() {
+    this.dialog.open(NewTransactionDialogComponent, {
+      width: '400px',
+      data: {
+        // Pass any data you need to the dialog here
       }
     });
   }
