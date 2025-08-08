@@ -5,10 +5,11 @@ import { LoadingComponent } from "@presentation/shared/ui/loading/loading.compon
 import { LoadingService } from "@presentation/shared/services";
 import { CommonModule } from '@angular/common';
 import { GlobalUserService } from '@application/use-cases';
+import { DrawerComponent } from "@presentation/shared/ui/drawer/drawer.ng";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToolbarComponent, LoadingComponent, CommonModule],
+  imports: [RouterOutlet, ToolbarComponent, LoadingComponent, CommonModule, DrawerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

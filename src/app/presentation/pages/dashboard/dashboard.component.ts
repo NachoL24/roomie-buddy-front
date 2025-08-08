@@ -16,8 +16,8 @@ import { GlobalUserService } from '@application/use-cases';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatGridListModule
-  ],
+    MatGridListModule,
+],
   template: `
     <mat-card>
       <mat-card-header>

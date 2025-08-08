@@ -1,8 +1,12 @@
 @if (loadingService.isLoading()) {
 <app-loading />
 } @else {
-<app-toolbar />
-<div class="page-container">
-  <router-outlet />
-</div>
+  <app-toolbar />
+  <app-drawer>
+    <div drawer-content>
+      <div class="page-container">
+        <router-outlet />
+      </div>
+      </div>
+  </app-drawer>
 }
