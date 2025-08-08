@@ -7,7 +7,8 @@ import {
   HouseExpenseRepository,
   PersonalExpenseRepository,
   IncomeRepository,
-  SettlementRepository
+  SettlementRepository,
+  FinancialActivityRepository
 } from '../../domain/repositories';
 import {
   UserRestClient,
@@ -17,7 +18,8 @@ import {
   HouseExpenseRestClient,
   PersonalExpenseRestClient,
   IncomeRestClient,
-  SettlementRestClient
+  SettlementRestClient,
+  FinancialActivityRestClient
 } from '../rest-clients';
 
 /**
@@ -56,5 +58,9 @@ export const REPOSITORY_PROVIDERS: Provider[] = [
   {
     provide: SettlementRepository,
     useClass: SettlementRestClient
+  },
+  {
+    provide: FinancialActivityRepository,
+    useClass: FinancialActivityRestClient
   }
 ];

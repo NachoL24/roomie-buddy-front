@@ -5,3 +5,4 @@ export * from './invitation.entity';
 export * from './expense.entity';
 export * from './income.entity';
 export * from './settlement.entity';
+export * from './financial-activity.entity';

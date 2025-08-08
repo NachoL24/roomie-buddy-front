@@ -7,3 +7,4 @@ export * from './house-expense.rest-client';
 export * from './personal-expense.rest-client';
 export * from './income.rest-client';
 export * from './settlement.rest-client';
+export * from './financial-activity.rest-client';

@@ -9,3 +9,4 @@ export * from './income.service';
 export * from './settlement.service';
 export * from './auth.service';
 export * from './global-user.service';
+export * from './financial-activity.service';

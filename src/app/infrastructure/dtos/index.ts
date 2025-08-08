@@ -5,3 +5,4 @@ export * from './invitation.dto';
 export * from './expense.dto';
 export * from './income.dto';
 export * from './settlement.dto';
+export * from './financial-activity.dto';
