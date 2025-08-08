@@ -6,6 +6,9 @@ import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
 import { MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatNativeDateModule } from "@angular/material/core";
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { PersonalExpenseService } from "@application/use-cases/personal-expense.service";
 import { IncomeService } from "@application/use-cases/income.service";
 import { CreatePersonalExpenseData } from "@domain/repositories";
@@ -14,7 +17,8 @@ import { CreateIncomeData } from "@domain/repositories";
 @Component({
   selector: "app-new-transaction-dialog",
   standalone: true,
-  imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule],
+  imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule],
+  providers: [provideNativeDateAdapter()],
   template: `
     <h2>Nueva Transacción</h2>
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
@@ -49,6 +53,27 @@ import { CreateIncomeData } from "@domain/repositories";
         @if (transactionForm.get('type')?.invalid && transactionForm.get('type')?.touched) {
           <mat-error>El tipo es requerido</mat-error>
         }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date" placeholder="DD/MM/YYYY" required>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        @if (transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched) {
+          <mat-error>
+            @if (transactionForm.get('date')?.errors?.['required']) {
+              La fecha es requerida
+            } @else if (transactionForm.get('date')?.errors?.['matDatepickerMax']) {
+              No se pueden seleccionar fechas futuras
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora (opcional)</mat-label>
+        <input matInput type="time" formControlName="time" placeholder="HH:MM">
       </mat-form-field>
 
       <div class="actions">
@@ -99,13 +124,22 @@ export class NewTransactionDialogComponent {
 
   transactionForm: FormGroup;
   isSubmitting = false;
+  maxDate = new Date(); // No permitir fechas futuras
 
   constructor() {
     this.transactionForm = this.fb.group({
       description: ['', [Validators.required]],
       amount: [null, [Validators.required, Validators.min(0.01)]],
-      type: ['', [Validators.required]]
+      type: ['', [Validators.required]],
+      date: [new Date(), [Validators.required]], // Fecha por defecto: hoy
+      time: [''] // Hora opcional
     });
+
+    // Agregar validador de fecha máxima al datepicker
+    const dateControl = this.transactionForm.get('date');
+    if (dateControl) {
+      dateControl.addValidators(this.maxDateValidator.bind(this));
+    }
   }
 
   onSubmit() {
@@ -122,10 +156,13 @@ export class NewTransactionDialogComponent {
   }
 
   private createPersonalExpense(formValue: any) {
+    // Construir la fecha correctamente combinando fecha y hora
+    const transactionDate = this.buildTransactionDate(formValue.date, formValue.time);
+
     const expenseData: CreatePersonalExpenseData = {
       description: formValue.description,
       amount: formValue.amount,
-      date: new Date()
+      date: transactionDate
     };
 
     this.personalExpenseService.createPersonalExpense(expenseData).subscribe({
@@ -142,10 +179,13 @@ export class NewTransactionDialogComponent {
   }
 
   private createIncome(formValue: any) {
+    // Construir la fecha correctamente combinando fecha y hora
+    const transactionDate = this.buildTransactionDate(formValue.date, formValue.time);
+
     const incomeData: CreateIncomeData = {
       description: formValue.description,
       amount: formValue.amount,
-      earnedAt: new Date(),
+      earnedAt: transactionDate,
       isRecurring: false
     };
 
@@ -160,6 +200,35 @@ export class NewTransactionDialogComponent {
         this.isSubmitting = false;
       }
     });
+  }
+
+  private maxDateValidator(control: any): any {
+    if (!control.value) return null;
+
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+
+    // Normalizar las fechas a medianoche para comparar solo días
+    selectedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    return selectedDate > today ? { matDatepickerMax: { max: today, actual: selectedDate } } : null;
+  }
+
+  private buildTransactionDate(date: Date, time?: string): Date {
+    // Crear una nueva fecha basada en la fecha seleccionada
+    const transactionDate = new Date(date);
+
+    if (time) {
+      // Si se proporcionó una hora, parsearla y aplicarla
+      const [hours, minutes] = time.split(':').map(Number);
+      transactionDate.setHours(hours, minutes, 0, 0);
+    } else {
+      // Si no se proporcionó hora, usar 00:00:00
+      transactionDate.setHours(0, 0, 0, 0);
+    }
+
+    return transactionDate;
   }
 
   onCancel() {
