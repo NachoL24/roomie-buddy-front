@@ -24,7 +24,7 @@ import { MatIconModule } from "@angular/material/icon";
         <mat-card-title class="title">Ingresos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <p class="money">{{ expenses()?.MonthIncome | currency }}</p>
+        <p class="money income">{{ expenses()?.MonthIncome | currency }}</p>
       </mat-card-content>
     </mat-card>
     <mat-card class="card">
@@ -35,7 +35,7 @@ import { MatIconModule } from "@angular/material/icon";
         <mat-card-title class="title">Gastos</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <p class="money">{{ expenses()?.MonthExpenses | currency }}</p>
+        <p class="money expense">{{ expenses()?.MonthExpenses | currency }}</p>
       </mat-card-content>
     </mat-card>
     <mat-card class="card">
@@ -46,7 +46,7 @@ import { MatIconModule } from "@angular/material/icon";
         <mat-card-title class="title">Saldo Total</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <p class="money">{{ expenses()?.totalBalance | currency }}</p>
+        <p class="money total">{{ expenses()?.totalBalance | currency }}</p>
       </mat-card-content>
     </mat-card>
   }
@@ -76,6 +76,18 @@ import { MatIconModule } from "@angular/material/icon";
       margin: 5px;
       font-size: 24px;
       font-weight: bold;
+      color: var(--mat-sys-primary);
+    }
+
+    .income {
+      color: var(--income);
+    }
+
+    .expense {
+      color: var(--mat-sys-error);
+    }
+
+    .total {
       color: var(--mat-sys-primary);
     }
 

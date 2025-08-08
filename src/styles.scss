@@ -9,10 +9,12 @@ html {
       density: 0,
     )
   );
+  --income: rgb(52, 103, 72);
 }
 
 html.dark-mode {
   color-scheme: dark;
+  --income: #489265ff;
 }
 
 html,
