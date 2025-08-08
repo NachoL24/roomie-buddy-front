@@ -2,24 +2,19 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { FinancialActivityService } from "@application/use-cases";
 import { FinancialActivity, FinancialActivityType } from "@domain/entities/financial-activity.entity";
 import { Page } from "@domain/entities/page.entity";
-import { CurrencyPipe, DatePipe } from "@angular/common";
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
+import { TransactionCardComponent } from '@presentation/shared/ui';
 
 @Component({
   selector: "app-my-transactions",
   standalone: true,
   imports: [
-    CurrencyPipe,
-    DatePipe,
-    MatCardModule,
     MatIconModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    MatChipsModule
+    TransactionCardComponent
   ],
   template: `
     <div class="transactions-container">
@@ -35,31 +30,7 @@ import { MatChipsModule } from '@angular/material/chips';
         @if (page().items.length > 0) {
           <div class="transactions-list">
             @for (activity of page().items; track activity.id) {
-              <mat-card class="transaction-card" [class.income]="activity.type === 'income'" [class.expense]="activity.type === 'expense'">
-                <mat-card-content>
-                  <div class="transaction-content">
-                    <div class="transaction-icon">
-                      @if (activity.type === 'income') {
-                        <mat-icon class="income-icon">trending_up</mat-icon>
-                      } @else {
-                        <mat-icon class="expense-icon">trending_down</mat-icon>
-                      }
-                    </div>
-                    <div class="transaction-details">
-                      <div class="transaction-description">{{ activity.description }}</div>
-                      <div class="transaction-date">{{ activity.date | date:'dd/MM/yyyy HH:mm' }}</div>
-                    </div>
-                    <div class="transaction-amount-container">
-                      <!-- <mat-chip class="transaction-type" [class.income-chip]="activity.type === 'income'" [class.expense-chip]="activity.type === 'expense'">
-                        {{ activity.type === 'income' ? 'Ingreso' : 'Gasto' }}
-                      </mat-chip> -->
-                      <div class="transaction-amount" [class.income-amount]="activity.type === 'income'" [class.expense-amount]="activity.type === 'expense'">
-                        {{ activity.type === 'income' ? '+' : '-' }}{{ activity.amount | currency:'ARS':'symbol':'1.2-2' }}
-                      </div>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+              <app-transaction-card [activity]="activity"></app-transaction-card>
             }
           </div>
 
@@ -114,102 +85,7 @@ import { MatChipsModule } from '@angular/material/chips';
     .transactions-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-    }
-
-    .transaction-card {
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .transaction-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .transaction-card.income {
-      border-left: 4px solid var(--income);
-    }
-
-    .transaction-card.expense {
-      border-left: 4px solid var(--mat-sys-error);
-    }
-
-    .transaction-content {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .transaction-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background-color: var(--mat-sys-surface-variant);
-    }
-
-    .income-icon {
-      color: var(--income);
-    }
-
-    .expense-icon {
-      color: var(--mat-sys-error);
-    }
-
-    .transaction-details {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .transaction-description {
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: var(--mat-sys-on-surface);
-    }
-
-    .transaction-date {
-      font-size: 0.9rem;
-      color: var(--mat-sys-on-surface-variant);
-    }
-
-    .transaction-amount-container {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-    }
-
-    .transaction-type {
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .income-chip {
-      background-color: var(--mat-sys-tertiary-container);
-      color: var(--mat-sys-on-tertiary-container);
-    }
-
-    .expense-chip {
-      background-color: var(--mat-sys-error-container);
-      color: var(--mat-sys-on-error-container);
-    }
-
-    .transaction-amount {
-      font-size: 1.3rem;
-      font-weight: 600;
-    }
-
-    .income-amount {
-      color: var(--income);
-    }
-
-    .expense-amount {
-      color: var(--mat-sys-error);
+      gap: 0;
     }
 
     .transactions-paginator {
@@ -245,30 +121,9 @@ import { MatChipsModule } from '@angular/material/chips';
       font-size: 14px;
     }
 
-    mat-paginator {
-      margin-top: 8px !important;
-    }
-
     @media (max-width: 768px) {
       .transactions-container {
         padding: 12px;
-      }
-
-      .transaction-content {
-        gap: 12px;
-      }
-
-      .transaction-icon {
-        width: 40px;
-        height: 40px;
-      }
-
-      .transaction-description {
-        font-size: 14px;
-      }
-
-      .transaction-amount {
-        font-size: 16px;
       }
     }
   `]
