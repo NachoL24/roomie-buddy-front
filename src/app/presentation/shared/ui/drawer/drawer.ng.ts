@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { MatSidenavModule } from "@angular/material/sidenav";
+import { GlobalUserService } from "@application/use-cases";
 
 @Component({
   selector: "app-drawer",
@@ -9,10 +10,8 @@ import { MatSidenavModule } from "@angular/material/sidenav";
   ],
   template: `
     <mat-drawer-container class="drawer-container">
-      <mat-drawer mode="side" opened class="drawer">
-        <div class="drawer-header-content">
-          <h2>Drawer Header</h2>
-        </div>
+      <mat-drawer mode="side" [opened]="userState.isLoggedIn()" class="drawer">
+        
       </mat-drawer>
       <mat-drawer-content>
         <ng-content select="[drawer-content]"></ng-content>
@@ -20,15 +19,20 @@ import { MatSidenavModule } from "@angular/material/sidenav";
     </mat-drawer-container>
   `,
   styles: [`
-    .drawer-container {
-      height: 100%;
+    .drawer {
+      position: fixed;
+      top: 64px;
+      z-index: 10;
+      width: 220px;
     }
 
-    .drawer {
-      background-color: var(--mat-sys-primary);
-      height: 100%;
+    mat-drawer-content {
+      margin-left: 0;
+      min-height: 100%;
+      transition: margin-left 0.5s ease;
     }
   `]
 })
 export class DrawerComponent {
+  public userState = inject(GlobalUserService);
 }

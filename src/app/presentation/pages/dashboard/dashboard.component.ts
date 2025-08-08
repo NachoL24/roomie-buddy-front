@@ -29,6 +29,67 @@ import { GlobalUserService } from '@application/use-cases';
           <p>Welcome back, {{ userState.user()?.firstName }}!</p>
         }
       </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      <mat-card-content>
+        <p>This is the content of the homepage.</p>
+        @if (userState.isLoggedIn()) {
+          <p>Welcome back, {{ userState.user()?.firstName }}!</p>
+        }
+      </mat-card-content>
+      
     </mat-card>
   `
 })

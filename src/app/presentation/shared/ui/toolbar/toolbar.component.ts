@@ -14,7 +14,7 @@ import { CommonModule } from "@angular/common";
   selector: 'app-toolbar',
   imports: [MatToolbarModule, MatButtonModule, MatIconModule, UserMenuComponent, MatMenuModule, ThemeSwitcherComponent, CommonModule],
   template: `
-    <mat-toolbar color="primary">
+    <mat-toolbar class="toolbar">
       @if (theme.resolvedTheme() === 'dark') {
         <img src="assets/icon-light.png" alt="Logo" class="logo"/>
       } @else {
@@ -46,6 +46,11 @@ import { CommonModule } from "@angular/common";
     </mat-toolbar>
   `,
   styles: [`
+    .toolbar {
+      position: fixed;
+      z-index: 20;
+      height: 64px;
+    }
     .spacer {
       flex: 1 1 auto;
     }
