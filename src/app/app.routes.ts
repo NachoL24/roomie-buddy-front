@@ -4,6 +4,7 @@ import { authGuard } from '@presentation/shared/guards/auth.guard';
 import { MyDashboardComponent } from './presentation/pages/dashboard/my-dashboard.component';
 import { HomepageComponent } from '@presentation/pages/homepage/homepage.component';
 import { AuthCallbackComponent } from '@presentation/pages/auth-callback/auth-callback.component';
+import { HouseDashboardComponent } from './presentation/pages/house-dashboard/house-dashboard.component';
 
 export const routes: Routes = [
   {
@@ -17,6 +18,14 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: MyDashboardComponent,
+    resolve: {
+      user: userReadyResolver
+    },
+    canActivate: [authGuard]
+  },
+  {
+    path: 'house/:id/dashboard',
+    component: HouseDashboardComponent,
     resolve: {
       user: userReadyResolver
     },
