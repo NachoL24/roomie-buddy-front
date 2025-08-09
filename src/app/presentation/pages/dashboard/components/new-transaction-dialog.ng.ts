@@ -102,6 +102,29 @@ import { MatIconModule } from "@angular/material/icon";
       max-height: 90vh;
       overflow-y: auto;
       box-sizing: border-box;
+      /* Firefox */
+      scrollbar-width: thin;
+      scrollbar-color: var(--mat-sys-on-primary) transparent;
+    }
+
+    /* WebKit-based browsers */
+    :host::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    :host::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    :host::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      border: 2px solid transparent; /* creates padding around the thumb */
+      background-clip: content-box;
+    }
+
+    :host::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(0, 0, 0, 0.45);
     }
 
     .optional-time {
