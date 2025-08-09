@@ -21,6 +21,7 @@ export interface HouseResponseDto {
   name: string;
   createdAt: string;
   members: HouseMemberResponseDto[];
+  totalMembers: number;
 }
 
 export interface HouseMinimalResponseDto {
@@ -34,4 +35,5 @@ export interface HouseMemberResponseDto {
   email: string;
   payRatio: number;
   payRatioPercentage: number;
+  picture?: string;
 }

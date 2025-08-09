@@ -8,7 +8,8 @@ export class HouseMapper {
       id: response.id,
       name: response.name,
       createdAt: new Date(response.createdAt),
-      members: response.members.map(this.memberFromResponse)
+      members: response.members.map(this.memberFromResponse),
+      totalMembers: response.totalMembers
     };
   }
 
@@ -22,6 +23,7 @@ export class HouseMapper {
   static memberFromResponse(response: HouseMemberResponseDto): HouseMember {
     return {
       id: response.roomieId,
+      picture: response.picture,
       firstName: response.name,
       lastName: response.email,
       payRatio: response.payRatio,

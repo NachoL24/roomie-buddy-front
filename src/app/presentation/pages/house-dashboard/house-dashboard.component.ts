@@ -22,7 +22,7 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
       <div class="content">
         <section class="transactions">
           <div class="header">
-            <h2>Transacciones</h2>
+            <h2 class="table-title">Transacciones</h2>
             <button mat-stroked-button color="primary" (click)="openNewExpense()">
               <mat-icon>add</mat-icon>
               New Expense
@@ -61,7 +61,13 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
           <h2>Members</h2>
           <ul class="member-list">
             <li *ngFor="let m of house()?.members" class="member-item">
-              <div class="avatar">{{ initials(m.firstName, m.lastName) }}</div>
+               @if (m.picture) {
+                <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
+               } @else {
+              <div class="avatar">
+                {{ initials(m.firstName, m.lastName) }}
+              </div>
+               }
               <div class="info">
                 <div class="name">{{ m.firstName }} {{ m.lastName }}</div>
                 <div class="email text-muted">Ratio: {{ m.payRatioPercentage || (m.payRatio * 100) || 0 }}%</div>
@@ -79,10 +85,11 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
   styles: [`
     :host { display: block; }
     .house-dashboard { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
-    .header { display: flex; justify-content: space-between; align-items: center; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     h1 { font-size: 32px; margin: 0; }
+    .table-title { margin: 0; }
     .content { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
-    .transactions h2, .members h2 { margin: 0 0 8px; }
+     .members h2 { margin: 0 0 8px; }
     .table-wrapper { background: var(--mat-sys-surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--mat-sys-outline-variant); }
     table.tx-table { width: 100%; border-collapse: collapse; }
     .tx-table th, .tx-table td { padding: 14px 16px; border-bottom: 1px solid var(--mat-sys-outline-variant); text-align: left; }
@@ -117,7 +124,7 @@ export class HouseDashboardComponent implements OnInit {
   }
 
   private refresh(houseId: number) {
-    this.houseService.getHouseById(houseId).subscribe(h => this.house.set(h));
+    this.houseService.getHouseById(houseId).subscribe(h => { this.house.set(h);  console.log("en componente:", h); });
     this.expenseService.getHouseExpenses(houseId).subscribe(ex => this.expenses.set(ex));
   }
 

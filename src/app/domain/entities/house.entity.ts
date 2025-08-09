@@ -3,10 +3,12 @@ export interface House {
   name: string;
   createdAt: Date;
   members: HouseMember[];
+  totalMembers: number;
 }
 
 export interface HouseMember {
   id: number;
+  picture?: string;
   firstName: string;
   lastName: string;
   payRatio: number;
