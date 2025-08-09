@@ -1,36 +1,37 @@
 // House DTOs
 export interface CreateHouseRequestDto {
-    name: string;
+  name: string;
 }
 
 export interface UpdateHouseNameRequestDto {
-    name: string;
+  name: string;
 }
 
 export interface UpdatePayRatiosRequestDto {
-    payRatios: PayRatioUpdateDto[];
+  payRatios: PayRatioUpdateDto[];
 }
 
 export interface PayRatioUpdateDto {
-    roomieId: number;
-    payRatio: number;
+  roomieId: number;
+  payRatio: number;
 }
 
 export interface HouseResponseDto {
-    id: number;
-    name: string;
-    createdAt: string;
-    members: HouseMemberResponseDto[];
+  id: number;
+  name: string;
+  createdAt: string;
+  members: HouseMemberResponseDto[];
 }
 
 export interface HouseMinimalResponseDto {
-    id: number;
-    name: string;
+  id: number;
+  name: string;
 }
 
 export interface HouseMemberResponseDto {
-    id: number;
-    firstName: string;
-    lastName: string;
-    payRatio: number;
+  roomieId: number;
+  name: string;
+  email: string;
+  payRatio: number;
+  payRatioPercentage: number;
 }

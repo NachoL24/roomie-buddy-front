@@ -40,7 +40,7 @@ export class ExpenseRestClient extends ExpenseRepository {
         if (endDate) params = params.set('endDate', endDate);
 
         return this.http.get<HouseExpenseResponseDto[]>(`${this.apiBaseUrl}/expenses/house/by-house/${houseId}`, { params })
-            .pipe(map(expenses => expenses.map(HouseExpenseMapper.fromResponse)));
+            .pipe(map(expenses => {console.log("Fetched expenses by house:", expenses); return expenses.map(ex => HouseExpenseMapper.fromResponse(ex))}));
     }
 
     getExpensesByRoomie(roomieId: number): Observable<HouseExpense[]> {

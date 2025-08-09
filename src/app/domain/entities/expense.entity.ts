@@ -15,6 +15,7 @@ export interface ExpenseShare {
   id: number;
   expenseId: number;
   roomieId: number;
+  roomiePicture?: string;
   shareAmount: number;
 }
 

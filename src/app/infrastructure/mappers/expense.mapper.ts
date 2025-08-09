@@ -44,6 +44,7 @@ export class HouseExpenseMapper {
       id: response.id,
       expenseId: response.expenseId,
       roomieId: response.roomieId,
+      roomiePicture: response.roomiePicture,  
       shareAmount: response.shareAmount
     };
   }

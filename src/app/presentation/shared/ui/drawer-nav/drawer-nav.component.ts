@@ -42,7 +42,7 @@ import { Router } from '@angular/router';
         @if (houses$ | async; as houses) {
           @for (house of houses; track house.id) {
             <a mat-list-item
-               [routerLink]="['/dashboard/house', house.id]"
+               [routerLink]="['/house', house.id, 'dashboard']"
                routerLinkActive="active-item">
               <mat-icon matListItemIcon>home</mat-icon>
               <span matListItemTitle>{{ house.name }}</span>
@@ -144,7 +144,7 @@ export class DrawerNavComponent implements OnInit {
             this.houses$ = this.houseService.getHousesByRoomieId(currentUser.id);
           }
           // navegar a la nueva casa
-          this.router.navigate(['/dashboard/house', house.id]);
+          this.router.navigate(['/house', house.id, 'dashboard']);
         },
         error: (err) => {
           console.error('Error creating house', err);

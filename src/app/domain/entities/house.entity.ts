@@ -10,6 +10,7 @@ export interface HouseMember {
   firstName: string;
   lastName: string;
   payRatio: number;
+  payRatioPercentage: number;
 }
 
 export interface HouseMinimal {

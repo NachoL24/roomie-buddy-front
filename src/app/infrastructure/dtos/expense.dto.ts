@@ -37,6 +37,7 @@ export interface ExpenseShareResponseDto {
   id: number;
   expenseId: number;
   roomieId: number;
+  roomiePicture?: string;
   shareAmount: number;
 }
 

@@ -21,7 +21,7 @@ export class HouseRestClient extends HouseRepository {
 
   getHouseById(id: number): Observable<House> {
     return this.http.get<HouseResponseDto>(`${this.apiBaseUrl}/houses/${id}`)
-      .pipe(map(HouseMapper.fromResponse));
+      .pipe(map(house => { console.log("Fetched house:", house); return HouseMapper.fromResponse(house); }));
   }
 
   getHousesByRoomie(roomieId: number): Observable<HouseMinimal[]> {
