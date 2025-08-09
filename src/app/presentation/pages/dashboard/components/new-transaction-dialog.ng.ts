@@ -99,6 +99,9 @@ import { MatIconModule } from "@angular/material/icon";
       display: block;
       padding: 24px;
       max-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-sizing: border-box;
     }
 
     .optional-time {
