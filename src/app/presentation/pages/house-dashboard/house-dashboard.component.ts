@@ -7,13 +7,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HouseService, ExpenseService } from '@application/use-cases';
 import { House, HouseExpense } from '@domain/entities';
+import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense-card/house-expense-card.component';
 import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
 import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard/invite-member-dialog.component';
 
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, HouseExpenseCardComponent],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -28,33 +29,18 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
               New Expense
             </button>
           </div>
-          @if (expenses() && expenses().length) {
-          <div class="table-wrapper">
-            <table class="tx-table">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Payer</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let ex of expenses()">
-                  <td>{{ ex.description || '-' }}</td>
-                  <td>{{ ex.amount | currency:'USD':'symbol' }}</td>
-                  <td>{{ payerName(ex.paidById) }}</td>
-                  <td>{{ ex.date | date:'yyyy-MM-dd' }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-            }
-            @else {
-              <ng-template #emptyTx>
-                <div class="empty">No transactions yet</div>
-              </ng-template>
-            }
+          @if (expenses().length) {
+            <div class="card-list">
+              <app-house-expense-card
+                *ngFor="let ex of expenses()"
+                [expense]="ex"
+                [payer]="payerName(ex.paidById)"
+                (deleted)="refresh(house()!.id)"
+              />
+            </div>
+          } @else {
+            <div class="empty">No transactions yet</div>
+          }
         </section>
 
         <aside class="members">
@@ -90,10 +76,7 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
     .table-title { margin: 0; }
     .content { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
      .members h2 { margin: 0 0 8px; }
-    .table-wrapper { background: var(--mat-sys-surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--mat-sys-outline-variant); }
-    table.tx-table { width: 100%; border-collapse: collapse; }
-    .tx-table th, .tx-table td { padding: 14px 16px; border-bottom: 1px solid var(--mat-sys-outline-variant); text-align: left; }
-    .tx-table thead th { background: var(--mat-sys-surface-variant); }
+  .card-list { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .empty { padding: 24px; color: var(--mat-sys-on-surface-variant); border: 1px dashed var(--mat-sys-outline-variant); border-radius: 12px; }
     .members { display: flex; flex-direction: column; gap: 12px; }
     .member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
@@ -123,8 +106,8 @@ export class HouseDashboardComponent implements OnInit {
     this.refresh(houseId);
   }
 
-  private refresh(houseId: number) {
-    this.houseService.getHouseById(houseId).subscribe(h => { this.house.set(h);  console.log("en componente:", h); });
+  refresh(houseId: number) {
+    this.houseService.getHouseById(houseId).subscribe(h => { this.house.set(h); console.log("en componente:", h); });
     this.expenseService.getHouseExpenses(houseId).subscribe(ex => this.expenses.set(ex));
   }
 
