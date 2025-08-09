@@ -1,5 +1,5 @@
 import { Component, Inject, inject } from "@angular/core";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormField } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -65,8 +65,8 @@ import { FinancialActivity } from "@domain/entities/financial-activity.entity";
           <mat-error>
             @if (transactionForm.get('date')?.errors?.['required']) {
               La fecha es requerida
-            } @else if (transactionForm.get('date')?.errors?.['matDatepickerMax']) {
-              No se pueden seleccionar fechas futuras
+            } @else if (transactionForm.get('date')?.errors?.['dateTimeFuture']) {
+              No se pueden seleccionar fecha y hora futuras
             }
           </mat-error>
         }
@@ -132,11 +132,17 @@ export class NewTransactionDialogComponent {
       time: [''] // Hora opcional
     });
 
-    // Agregar validador de fecha máxima al datepicker
+    // Agregar validador que evita seleccionar fecha y hora futuras
     const dateControl = this.transactionForm.get('date');
     if (dateControl) {
-      dateControl.addValidators(this.maxDateValidator.bind(this));
+      dateControl.addValidators(this.maxDateTimeValidator.bind(this));
     }
+
+    // Revalidar fecha cuando cambia la hora
+    const timeControl = this.transactionForm.get('time');
+    timeControl?.valueChanges.subscribe(() => {
+      dateControl?.updateValueAndValidity({ onlySelf: true });
+    });
 
     // Detectar modo edición si llega activity por data
     if (this.data?.activity) {
@@ -283,17 +289,26 @@ export class NewTransactionDialogComponent {
     });
   }
 
-  private maxDateValidator(control: any): any {
-    if (!control.value) return null;
+  private maxDateTimeValidator(control: AbstractControl): ValidationErrors | null {
+    // Valida que la combinación de fecha y hora no sea futura
+    if (!control?.value) return null;
 
-    const selectedDate = new Date(control.value);
-    const today = new Date();
+    const rawDate = control.value;
+    const date = new Date(rawDate);
+    if (isNaN(date.getTime())) return null; // dejar otros validadores manejar formatos inválidos
 
-    // Normalizar las fechas a medianoche para comparar solo días
-    selectedDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
+    const time: string | undefined = control.parent?.get('time')?.value;
 
-    return selectedDate > today ? { matDatepickerMax: { max: today, actual: selectedDate } } : null;
+    const candidate = new Date(date);
+    if (time && typeof time === 'string' && /^\d{2}:\d{2}$/.test(time)) {
+      const [h, m] = time.split(':').map(Number);
+      candidate.setHours(h, m, 0, 0);
+    } else {
+      candidate.setHours(0, 0, 0, 0);
+    }
+
+    const now = new Date();
+    return candidate.getTime() > now.getTime() ? { dateTimeFuture: true } : null;
   }
 
   private buildTransactionDate(date: Date, time?: string): Date {
