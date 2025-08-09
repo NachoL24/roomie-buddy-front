@@ -3,18 +3,20 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FinancialActivity } from '@domain/entities/financial-activity.entity';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
-    selector: 'app-transaction-card',
-    standalone: true,
-    imports: [
-        CurrencyPipe,
-        DatePipe,
-        MatCardModule,
-        MatIconModule
-    ],
-    template: `
-    <mat-card class="transaction-card" [class.income]="activity.type === 'income'" [class.expense]="activity.type === 'expense'">
+  selector: 'app-transaction-card',
+  standalone: true,
+  imports: [
+    CurrencyPipe,
+    DatePipe,
+    MatCardModule,
+    MatIconModule,
+    MatMenuModule
+  ],
+  template: `
+    <mat-card class="transaction-card" [class.income]="activity.type === 'income'" [class.expense]="activity.type === 'expense'" [matContextMenuTriggerFor]="contextMenu">
       <mat-card-content>
         <div class="transaction-content">
           <div class="transaction-icon">
@@ -36,8 +38,19 @@ import { FinancialActivity } from '@domain/entities/financial-activity.entity';
         </div>
       </mat-card-content>
     </mat-card>
+
+    <mat-menu #contextMenu="matMenu">
+      <button mat-menu-item (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+      <button mat-menu-item (click)="onDelete()" class="delete-button">
+        <mat-icon class="delete-icon">delete</mat-icon>
+        Delete
+      </button>
+    </mat-menu>
   `,
-    styles: [`
+  styles: [`
     .transaction-card {
       transition: all 0.2s ease;
       cursor: pointer;
@@ -119,6 +132,14 @@ import { FinancialActivity } from '@domain/entities/financial-activity.entity';
       color: var(--mat-sys-error);
     }
 
+    .delete-button, .delete-icon {
+      color: var(--mat-sys-error);
+    }
+
+    .delete-button:hover {
+      background-color: var(--mat-sys-on-error);
+    }
+
     @media (max-width: 768px) {
       .transaction-content {
         gap: 12px;
@@ -140,5 +161,15 @@ import { FinancialActivity } from '@domain/entities/financial-activity.entity';
   `]
 })
 export class TransactionCardComponent {
-    @Input({ required: true }) activity!: FinancialActivity;
+  @Input({ required: true }) activity!: FinancialActivity;
+
+  onEdit() {
+    console.log('Edit clicked:', this.activity);
+    // Handle edit action
+  }
+
+  onDelete() {
+    console.log('Delete clicked:', this.activity);
+    // Handle delete action
+  }
 }
