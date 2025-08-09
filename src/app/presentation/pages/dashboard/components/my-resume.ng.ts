@@ -56,7 +56,7 @@ import { MatIconModule } from "@angular/material/icon";
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       grid-gap: 16px;
-      gap: 24px;
+      gap: 16px;
       align-items: center;
       justify-content: center;
     }
@@ -65,6 +65,13 @@ import { MatIconModule } from "@angular/material/icon";
       padding: 2px 0;
       width: 100%;
       height: 110px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .avatar {

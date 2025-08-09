@@ -60,7 +60,6 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
     .transaction-card {
       transition: all 0.2s ease;
       cursor: pointer;
-      margin-bottom: 12px;
     }
 
     .transaction-card:hover {

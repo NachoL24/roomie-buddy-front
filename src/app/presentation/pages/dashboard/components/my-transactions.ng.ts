@@ -98,11 +98,7 @@ import { MyResumeComponent } from "./my-resume.ng";
     .transactions-list {
       display: flex;
       flex-direction: column;
-      gap: 0;
-    }
-
-    .transactions-paginator {
-      margin-top: 24px;
+      gap: 10px;
     }
 
     .empty-state {
@@ -132,6 +128,10 @@ import { MyResumeComponent } from "./my-resume.ng";
     .empty-state p {
       margin: 0;
       font-size: 14px;
+    }
+
+    .transactions-paginator {
+      margin-top: 8px;
     }
 
     @media (max-width: 768px) {
