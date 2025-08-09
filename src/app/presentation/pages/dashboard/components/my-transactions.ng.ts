@@ -64,7 +64,7 @@ import { MyResumeComponent } from "./my-resume.ng";
   `,
   styles: [`
     .transactions-container {
-      padding: 16px;
+      //padding: 16px;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -73,9 +73,12 @@ import { MyResumeComponent } from "./my-resume.ng";
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-top: 8px;
+      margin-bottom: 12px;
     }
 
     .title {
+      margin:0;
       font-size: 28px;
       font-weight: 500;
       color: var(--mat-sys-on-surface);

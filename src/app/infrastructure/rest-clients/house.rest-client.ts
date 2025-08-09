@@ -29,10 +29,10 @@ export class HouseRestClient extends HouseRepository {
       .pipe(map(houses => houses.map(HouseMapper.fromResponseMinimal)));
   }
 
-  createHouse(name: string): Observable<House> {
+  createHouse(name: string): Observable<HouseMinimal> {
     const request = HouseMapper.toCreateRequest(name);
     return this.http.post<HouseResponseDto>(`${this.apiBaseUrl}/houses`, request)
-      .pipe(map(HouseMapper.fromResponse));
+      .pipe(map(house => HouseMapper.fromResponseMinimal(house)));
   }
 
   updateHouseName(houseId: number, name: string): Observable<House> {

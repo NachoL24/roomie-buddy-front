@@ -5,7 +5,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatFormField } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
@@ -21,7 +21,7 @@ import { MatIconModule } from "@angular/material/icon";
 @Component({
   selector: "app-new-transaction-dialog",
   standalone: true,
-  imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule, MatIconModule],
+  imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule, MatIconModule, MatDialogModule],
   template: `
     <h2>{{ isEditMode ? 'Editar Transacción' : 'Nueva Transacción' }}</h2>
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">

@@ -8,6 +8,10 @@ import { Observable } from 'rxjs';
 import { HouseService, GlobalUserService } from '@application/use-cases';
 import { HouseMinimal } from '@domain/entities';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CreateHouseDialogComponent } from '@presentation/shared/ui/create-house-dialog/create-house-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-drawer-nav',
@@ -18,7 +22,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatListModule,
     MatIconModule,
     MatDividerModule,
-    MatButtonModule
+    MatButtonModule,
+    MatDialogModule
   ],
   template: `
     <nav class="drawer-nav">
@@ -52,7 +57,7 @@ import { MatButtonModule } from '@angular/material/button';
           }
         }
       </mat-nav-list>
-      <button matButton="tonal" class="new-house-button">
+      <button matButton="tonal" class="new-house-button" (click)="createHouse()">
           <mat-icon matListItemIcon>add_home</mat-icon>
           <span matListItemTitle>Crear Casa</span>
       </button>
@@ -105,6 +110,9 @@ import { MatButtonModule } from '@angular/material/button';
 export class DrawerNavComponent implements OnInit {
   private houseService = inject(HouseService);
   private userService = inject(GlobalUserService);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
 
   houses$!: Observable<HouseMinimal[]>;
 
@@ -114,5 +122,35 @@ export class DrawerNavComponent implements OnInit {
     if (currentUser) {
       this.houses$ = this.houseService.getHousesByRoomieId(currentUser.id);
     }
+  }
+
+  createHouse() {
+    const dialogRef = this.dialog.open(CreateHouseDialogComponent, {
+      width: '400px',
+      autoFocus: true,
+      restoreFocus: false,
+    });
+
+    dialogRef.afterClosed().subscribe((name?: string) => {
+      const trimmed = (name ?? '').trim();
+      if (!trimmed) return; // cancelado o vacío
+
+      this.houseService.createHouse(trimmed).subscribe({
+        next: (house) => {
+          this.snackBar.open('Casa creada', 'Cerrar', { duration: 2500 });
+          // refrescar listado
+          const currentUser = this.userService.user();
+          if (currentUser) {
+            this.houses$ = this.houseService.getHousesByRoomieId(currentUser.id);
+          }
+          // navegar a la nueva casa
+          this.router.navigate(['/dashboard/house', house.id]);
+        },
+        error: (err) => {
+          console.error('Error creating house', err);
+          this.snackBar.open('Error al crear la casa', 'Cerrar', { duration: 3000 });
+        }
+      });
+    });
   }
 }

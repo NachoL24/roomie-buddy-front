@@ -9,7 +9,7 @@ export interface PayRatioUpdate {
 export abstract class HouseRepository {
     abstract getHouseById(id: number): Observable<House>;
     abstract getHousesByRoomie(roomieId: number): Observable<HouseMinimal[]>;
-    abstract createHouse(name: string): Observable<House>;
+    abstract createHouse(name: string): Observable<HouseMinimal>;
     abstract updateHouseName(houseId: number, name: string): Observable<House>;
     abstract updatePayRatios(houseId: number, payRatios: PayRatioUpdate[]): Observable<void>;
     abstract leaveHouse(houseId: number): Observable<void>;
