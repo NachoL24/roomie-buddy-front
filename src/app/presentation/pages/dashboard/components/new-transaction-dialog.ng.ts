@@ -1,5 +1,6 @@
 import { Component, Inject, inject } from "@angular/core";
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from "@angular/forms";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { dateTimeNotInFutureValidator } from "@presentation/shared/validators/date-time.validators";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormField } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -15,11 +16,12 @@ import { CreateIncomeData } from "@domain/repositories";
 import { UpdateIncomeData } from "@domain/repositories/income.repository";
 import { UpdatePersonalExpenseData } from "@domain/repositories/expense.repository";
 import { FinancialActivity } from "@domain/entities/financial-activity.entity";
+import { MatIconModule } from "@angular/material/icon";
 
 @Component({
   selector: "app-new-transaction-dialog",
   standalone: true,
-  imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule],
+  imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule, MatIconModule],
   template: `
     <h2>{{ isEditMode ? 'Editar Transacción' : 'Nueva Transacción' }}</h2>
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
@@ -61,7 +63,7 @@ import { FinancialActivity } from "@domain/entities/financial-activity.entity";
         <input matInput [matDatepicker]="picker" formControlName="date" placeholder="DD/MM/YYYY" required>
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
-        @if (transactionForm.get('date')?.invalid && transactionForm.get('date')?.touched) {
+        @if (transactionForm.get('date')?.invalid) {
           <mat-error>
             @if (transactionForm.get('date')?.errors?.['required']) {
               La fecha es requerida
@@ -72,9 +74,12 @@ import { FinancialActivity } from "@domain/entities/financial-activity.entity";
         }
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" >
         <mat-label>Hora (opcional)</mat-label>
         <input matInput type="time" formControlName="time" placeholder="HH:MM">
+        <mat-hint>
+          <mat-icon>info</mat-icon>
+          Si no ingresas una hora, se tomara la hora actual</mat-hint>
       </mat-form-field>
 
       <div class="actions">
@@ -94,6 +99,13 @@ import { FinancialActivity } from "@domain/entities/financial-activity.entity";
       display: block;
       padding: 24px;
       max-width: 400px;
+    }
+
+    .optional-time {
+      display: flex;
+      flex-direction: row;
+
+      gap: 8px;
     }
 
     h2 {
@@ -128,14 +140,14 @@ export class NewTransactionDialogComponent {
       description: ['', [Validators.required]],
       amount: [null, [Validators.required, Validators.min(0.01)]],
       type: ['', [Validators.required]],
-      date: [new Date(), [Validators.required]], // Fecha por defecto: hoy
+      date: [null, [Validators.required]], // Fecha por defecto: hoy
       time: [''] // Hora opcional
     });
 
     // Agregar validador que evita seleccionar fecha y hora futuras
     const dateControl = this.transactionForm.get('date');
     if (dateControl) {
-      dateControl.addValidators(this.maxDateTimeValidator.bind(this));
+      dateControl.addValidators(dateTimeNotInFutureValidator('time'));
     }
 
     // Revalidar fecha cuando cambia la hora
@@ -289,27 +301,7 @@ export class NewTransactionDialogComponent {
     });
   }
 
-  private maxDateTimeValidator(control: AbstractControl): ValidationErrors | null {
-    // Valida que la combinación de fecha y hora no sea futura
-    if (!control?.value) return null;
-
-    const rawDate = control.value;
-    const date = new Date(rawDate);
-    if (isNaN(date.getTime())) return null; // dejar otros validadores manejar formatos inválidos
-
-    const time: string | undefined = control.parent?.get('time')?.value;
-
-    const candidate = new Date(date);
-    if (time && typeof time === 'string' && /^\d{2}:\d{2}$/.test(time)) {
-      const [h, m] = time.split(':').map(Number);
-      candidate.setHours(h, m, 0, 0);
-    } else {
-      candidate.setHours(0, 0, 0, 0);
-    }
-
-    const now = new Date();
-    return candidate.getTime() > now.getTime() ? { dateTimeFuture: true } : null;
-  }
+  // Validator now lives in a shared file for reuse across components
 
   private buildTransactionDate(date: Date, time?: string): Date {
     // Crear una nueva fecha basada en la fecha seleccionada
