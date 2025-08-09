@@ -6,6 +6,8 @@ import { FinancialActivity } from '@domain/entities/financial-activity.entity';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NewTransactionDialogComponent } from '../../../pages/dashboard/components/new-transaction-dialog.ng';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { IncomeService, PersonalExpenseService } from '../../../..';
 
 @Component({
@@ -170,6 +172,7 @@ export class TransactionCardComponent {
   private dialog = inject(MatDialog);
   private personalExpenseService = inject(PersonalExpenseService);
   private incomeService = inject(IncomeService);
+  private snackBar = inject(MatSnackBar);
 
   onEdit() {
     const ref = this.dialog.open(NewTransactionDialogComponent, {
@@ -185,6 +188,41 @@ export class TransactionCardComponent {
   }
 
   onDelete() {
-    
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Eliminar transacción',
+        message: `¿Querés eliminar este ${this.activity.type === 'income' ? 'ingreso' : 'gasto'}? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar'
+      }
+    });
+
+    ref.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+
+      if (this.activity.type === 'expense') {
+        this.personalExpenseService.deletePersonalExpense(this.activity.id).subscribe({
+          next: () => {
+            this.snackBar.open('Gasto eliminado', 'Cerrar', { duration: 2500 });
+            this.edited.emit();
+          },
+          error: (error) => {
+            console.error('Error deleting expense', error);
+            this.snackBar.open('Error al eliminar el gasto', 'Cerrar', { duration: 3000 });
+          }
+        });
+      } else {
+        this.incomeService.deleteIncome(this.activity.id).subscribe({
+          next: () => {
+            this.snackBar.open('Ingreso eliminado', 'Cerrar', { duration: 2500 });
+            this.edited.emit();
+          },
+          error: (error) => {
+            console.error('Error deleting income', error);
+            this.snackBar.open('Error al eliminar el ingreso', 'Cerrar', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }
