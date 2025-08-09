@@ -35,6 +35,7 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
                 *ngFor="let ex of expenses()"
                 [expense]="ex"
                 [payer]="payerName(ex.paidById)"
+                [payerPicture]="payerPicture(ex.paidById)"
                 (deleted)="refresh(house()!.id)"
               />
             </div>
@@ -56,7 +57,7 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
                }
               <div class="info">
                 <div class="name">{{ m.firstName }} {{ m.lastName }}</div>
-                <div class="email text-muted">Ratio: {{ m.payRatioPercentage || (m.payRatio * 100) || 0 }}%</div>
+                <div class="email text-muted">Ratio: {{ m.payRatioPercentage || (m.payRatio * 100)+'%' || 0 }}</div>
               </div>
             </li>
           </ul>
@@ -83,7 +84,7 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
     .member-item { display: flex; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; border: 1px solid var(--mat-sys-outline-variant); }
     .avatar { width: 40px; height: 40px; border-radius: 50%; background: #f0d7cd; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
     .info .name { font-weight: 600; }
-    .text-muted { color: var(--mat-sys-on-surface-variant); font-size: 12px; }
+    .text-muted { color: var(--mat-sys-on-surface-variant); margin-top: 2px; font-size: 12px; }
     .invite { width: 100%; }
     .loading { color: var(--mat-sys-on-surface-variant); }
   `]
@@ -114,6 +115,10 @@ export class HouseDashboardComponent implements OnInit {
   payerName(roomieId: number): string {
     const m = this.house()?.members.find(x => x.id === roomieId);
     return m ? `${m.firstName} ${m.lastName}` : '—';
+  }
+
+  payerPicture(roomieId: number): string | undefined {
+    return this.house()?.members.find(x => x.id === roomieId)?.picture;
   }
 
   initials(first?: string, last?: string): string {

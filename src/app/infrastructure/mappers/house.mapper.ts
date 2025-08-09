@@ -25,7 +25,8 @@ export class HouseMapper {
       id: response.roomieId,
       picture: response.picture,
       firstName: response.name,
-      lastName: response.email,
+      lastName: response.lastName,
+      email: response.email,
       payRatio: response.payRatio,
       payRatioPercentage: response.payRatioPercentage
     };

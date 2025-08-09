@@ -11,6 +11,7 @@ export interface HouseMember {
   picture?: string;
   firstName: string;
   lastName: string;
+  email: string;
   payRatio: number;
   payRatioPercentage: number;
 }

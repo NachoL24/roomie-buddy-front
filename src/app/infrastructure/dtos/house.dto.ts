@@ -32,6 +32,7 @@ export interface HouseMinimalResponseDto {
 export interface HouseMemberResponseDto {
   roomieId: number;
   name: string;
+  lastName: string;
   email: string;
   payRatio: number;
   payRatioPercentage: number;
