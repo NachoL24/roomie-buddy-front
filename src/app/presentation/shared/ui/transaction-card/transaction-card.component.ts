@@ -1,9 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { FinancialActivity } from '@domain/entities/financial-activity.entity';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { NewTransactionDialogComponent } from '../../../pages/dashboard/components/new-transaction-dialog.ng';
+import { IncomeService, PersonalExpenseService } from '../../../..';
 
 @Component({
   selector: 'app-transaction-card',
@@ -13,7 +16,8 @@ import { MatMenuModule } from '@angular/material/menu';
     DatePipe,
     MatCardModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule
   ],
   template: `
     <mat-card class="transaction-card" [class.income]="activity.type === 'income'" [class.expense]="activity.type === 'expense'" [matContextMenuTriggerFor]="contextMenu">
@@ -162,14 +166,25 @@ import { MatMenuModule } from '@angular/material/menu';
 })
 export class TransactionCardComponent {
   @Input({ required: true }) activity!: FinancialActivity;
+  @Output() edited = new EventEmitter<void>();
+  private dialog = inject(MatDialog);
+  private personalExpenseService = inject(PersonalExpenseService);
+  private incomeService = inject(IncomeService);
 
   onEdit() {
-    console.log('Edit clicked:', this.activity);
-    // Handle edit action
+    const ref = this.dialog.open(NewTransactionDialogComponent, {
+      data: { activity: this.activity }
+    });
+
+    ref.afterClosed().subscribe(result => {
+      if (result) {
+        // Parent can refresh the list
+        this.edited.emit();
+      }
+    });
   }
 
   onDelete() {
-    console.log('Delete clicked:', this.activity);
-    // Handle delete action
+    
   }
 }

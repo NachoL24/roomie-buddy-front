@@ -38,7 +38,7 @@ import { MyResumeComponent } from "./my-resume.ng";
         @if (page().items.length > 0) {
           <div class="transactions-list">
             @for (activity of page().items; track activity.id) {
-              <app-transaction-card [activity]="activity"></app-transaction-card>
+              <app-transaction-card [activity]="activity" (edited)="onEdited()"></app-transaction-card>
             }
           </div>
 
@@ -177,6 +177,12 @@ export class MyTransactionsComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  onEdited() {
+    // Refresh the current page and resume summary after an edit
+    this.loadFinancialActivities(this.page().page, this.page().pageSize);
+    this.resumeComponent?.loadExpenseSummary();
   }
 
   newTransaction() {

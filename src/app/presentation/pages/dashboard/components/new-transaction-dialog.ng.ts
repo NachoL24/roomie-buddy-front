@@ -1,10 +1,10 @@
-import { Component, inject } from "@angular/core";
+import { Component, Inject, inject } from "@angular/core";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormField } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatSelectModule } from "@angular/material/select";
-import { MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
@@ -12,13 +12,16 @@ import { PersonalExpenseService } from "@application/use-cases/personal-expense.
 import { IncomeService } from "@application/use-cases/income.service";
 import { CreatePersonalExpenseData } from "@domain/repositories";
 import { CreateIncomeData } from "@domain/repositories";
+import { UpdateIncomeData } from "@domain/repositories/income.repository";
+import { UpdatePersonalExpenseData } from "@domain/repositories/expense.repository";
+import { FinancialActivity } from "@domain/entities/financial-activity.entity";
 
 @Component({
   selector: "app-new-transaction-dialog",
   standalone: true,
   imports: [MatFormField, MatInputModule, MatSelectModule, MatButtonModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule],
   template: `
-    <h2>Nueva Transacción</h2>
+    <h2>{{ isEditMode ? 'Editar Transacción' : 'Nueva Transacción' }}</h2>
     <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
       <mat-form-field appearance="outline">
         <mat-label>Descripción</mat-label>
@@ -44,7 +47,7 @@ import { CreateIncomeData } from "@domain/repositories";
 
       <mat-form-field appearance="outline">
         <mat-label>Tipo</mat-label>
-        <mat-select formControlName="type" required>
+        <mat-select formControlName="type" required [disabled]="isEditMode">
           <mat-option value="income">Ingreso</mat-option>
           <mat-option value="expense">Gasto</mat-option>
         </mat-select>
@@ -80,7 +83,7 @@ import { CreateIncomeData } from "@domain/repositories";
           @if (isSubmitting) {
             Guardando...
           } @else {
-            Guardar
+            {{ isEditMode ? 'Guardar cambios' : 'Guardar' }}
           }
         </button>
       </div>
@@ -119,12 +122,8 @@ export class NewTransactionDialogComponent {
   private snackBar = inject(MatSnackBar);
   private personalExpenseService = inject(PersonalExpenseService);
   private incomeService = inject(IncomeService);
-
-  transactionForm: FormGroup;
-  isSubmitting = false;
-  maxDate = new Date(); // No permitir fechas futuras
-
-  constructor() {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { activity?: FinancialActivity } | null = null) {
+    // Initialize form
     this.transactionForm = this.fb.group({
       description: ['', [Validators.required]],
       amount: [null, [Validators.required, Validators.min(0.01)]],
@@ -138,17 +137,57 @@ export class NewTransactionDialogComponent {
     if (dateControl) {
       dateControl.addValidators(this.maxDateValidator.bind(this));
     }
+
+    // Detectar modo edición si llega activity por data
+    if (this.data?.activity) {
+      this.isEditMode = true;
+      const activity = this.data.activity;
+      this.currentActivityId = activity.id;
+      this.currentType = activity.type;
+
+      // Prefill form
+      const activityDate = new Date(activity.date);
+      const timeStr = this.formatTime(activityDate);
+      this.transactionForm.patchValue({
+        description: activity.description,
+        amount: activity.amount,
+        type: activity.type,
+        date: activityDate,
+        time: timeStr
+      });
+      // Lock the type control in edit mode
+      this.transactionForm.get('type')?.disable();
+    }
   }
+
+  transactionForm!: FormGroup;
+  isSubmitting = false;
+  maxDate = new Date(); // No permitir fechas futuras
+  isEditMode = false;
+  private currentActivityId: number | null = null;
+  private currentType: 'income' | 'expense' | null = null;
+
+  // (constructor contains form initialization and edit-mode setup)
 
   onSubmit() {
     if (this.transactionForm.valid) {
       this.isSubmitting = true;
-      const formValue = this.transactionForm.value;
+      const formValue = this.getRawFormValue();
 
-      if (formValue.type === 'expense') {
-        this.createPersonalExpense(formValue);
-      } else if (formValue.type === 'income') {
-        this.createIncome(formValue);
+      if (this.isEditMode && this.currentActivityId && this.currentType) {
+        // Update flow
+        if (this.currentType === 'expense') {
+          this.updatePersonalExpense(this.currentActivityId, formValue);
+        } else {
+          this.updateIncome(this.currentActivityId, formValue);
+        }
+      } else {
+        // Create flow
+        if (formValue.type === 'expense') {
+          this.createPersonalExpense(formValue);
+        } else if (formValue.type === 'income') {
+          this.createIncome(formValue);
+        }
       }
     }
   }
@@ -176,6 +215,28 @@ export class NewTransactionDialogComponent {
     });
   }
 
+  private updatePersonalExpense(id: number, formValue: any) {
+    const transactionDate = this.buildTransactionDate(formValue.date, formValue.time);
+
+    const expenseData: UpdatePersonalExpenseData = {
+      description: formValue.description,
+      amount: formValue.amount,
+      date: transactionDate
+    };
+
+    this.personalExpenseService.updatePersonalExpense(id, expenseData).subscribe({
+      next: (expense) => {
+        this.snackBar.open('Gasto personal actualizado', 'Cerrar', { duration: 3000 });
+        this.dialogRef.close(expense);
+      },
+      error: (error) => {
+        console.error('Error updating personal expense:', error);
+        this.snackBar.open('Error al actualizar el gasto personal', 'Cerrar', { duration: 3000 });
+        this.isSubmitting = false;
+      }
+    });
+  }
+
   private createIncome(formValue: any) {
     // Construir la fecha correctamente combinando fecha y hora
     const transactionDate = this.buildTransactionDate(formValue.date, formValue.time);
@@ -195,6 +256,28 @@ export class NewTransactionDialogComponent {
       error: (error) => {
         console.error('Error creating income:', error);
         this.snackBar.open('Error al crear el ingreso', 'Cerrar', { duration: 3000 });
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  private updateIncome(id: number, formValue: any) {
+    const transactionDate = this.buildTransactionDate(formValue.date, formValue.time);
+
+    const incomeData: UpdateIncomeData = {
+      description: formValue.description,
+      amount: formValue.amount,
+      earnedAt: transactionDate
+    };
+
+    this.incomeService.updateIncome(id, incomeData).subscribe({
+      next: (income) => {
+        this.snackBar.open('Ingreso actualizado', 'Cerrar', { duration: 3000 });
+        this.dialogRef.close(income);
+      },
+      error: (error) => {
+        console.error('Error updating income:', error);
+        this.snackBar.open('Error al actualizar el ingreso', 'Cerrar', { duration: 3000 });
         this.isSubmitting = false;
       }
     });
@@ -227,6 +310,18 @@ export class NewTransactionDialogComponent {
     }
 
     return transactionDate;
+  }
+
+  private getRawFormValue() {
+    // Include disabled controls (like 'type' in edit mode)
+    const raw = this.transactionForm.getRawValue();
+    return raw as { description: string; amount: number; type: 'income' | 'expense'; date: Date; time?: string };
+  }
+
+  private formatTime(date: Date): string {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   onCancel() {
