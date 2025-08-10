@@ -48,9 +48,14 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
         <aside class="members">
           <div class="header">
             <h2 class="table-title">Members</h2>
-            <button matIconButton color="primary" (click)="openInvite()">
-              <mat-icon>add</mat-icon>
-            </button>
+            <div class="buttons">
+              <button matIconButton (click)="openInvite()">
+                <mat-icon>group_add</mat-icon>
+              </button>
+              <button matIconButton (click)="openSettings()">
+                <mat-icon>settings</mat-icon>
+              </button>
+            </div>
           </div>
           <ul class="member-list">
             <li *ngFor="let m of house()?.members" class="member-item">
@@ -100,10 +105,21 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
     .text-muted { color: var(--mat-sys-on-surface-variant); margin-top: 2px; font-size: 12px; }
     .invite { width: 100%; }
     .loading { color: var(--mat-sys-on-surface-variant); }
+    .buttons {
+      display: flex;
+      gap: 4px;
+    }
     @media (max-width: 870px) {
       .content {
         grid-template-columns: 1fr;
         margin-bottom: 16px;
+      }
+
+      .member-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-gap: 16px;
+        gap: 16px;
       }
     }
   `]
@@ -167,4 +183,8 @@ export class HouseDashboardComponent implements OnInit {
       }
     });
   }
+
+  openSettings() {
+  }
+
 }
