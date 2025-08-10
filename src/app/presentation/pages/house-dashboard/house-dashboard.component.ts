@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,11 +9,12 @@ import { HouseService, FinancialActivityService } from '@application/use-cases';
 import { FinancialActivity, FinancialActivityType, House } from '@domain/entities';
 import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
 import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard/invite-member-dialog.component';
+import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense-card/house-expense-card.component';
 
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DatePipe, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, HouseExpenseCardComponent],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -31,32 +32,7 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
           @if (activities().length) {
             <div class="card-list">
               @for (act of activities(); track act.id) {
-                <div class="activity-card" [class.expense]="act.type === activityType.EXPENSE" [class.settlement]="act.type === activityType.SETTLEMENT">
-                  <div class="transaction-content">
-                    <div class="transaction-left">
-                      <div class="transaction-icon">
-                        <mat-icon [class.expense-icon]="act.type === activityType.EXPENSE" [class.settlement-icon]="act.type === activityType.SETTLEMENT">
-                          {{ act.type === activityType.EXPENSE ? 'trending_down' : 'account_balance' }}
-                        </mat-icon>
-                        @if (act.paidByPicture) {
-                          <img class="payer-avatar" [src]="act.paidByPicture" alt="payer" />
-                        } @else if (act.paidByName) {
-                          <span class="payer-avatar initials">{{ initialsFromName(act.paidByName) }}</span>
-                        }
-                      </div>
-                    </div>
-                    <div class="transaction-details">
-                      <div class="transaction-description">{{ act.description || '-' }}</div>
-                      <div class="transaction-payer" *ngIf="act.paidByName">Pagó: <span class="payer-name">{{ act.paidByName }}</span></div>
-                      <div class="transaction-date">{{ act.date | date:'dd/MM/yyyy HH:mm' }}</div>
-                    </div>
-                    <div class="transaction-amount-container">
-                      <div class="transaction-amount" [class.expense-amount]="act.type === activityType.EXPENSE" [class.settlement-amount]="act.type === activityType.SETTLEMENT">
-                        {{ act.amount | currency:'ARS':'symbol':'1.2-2' }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <app-house-expense-card [activity]="act" (deleted)="refresh(house()!.id)" />
               }
             </div>
           } @else {

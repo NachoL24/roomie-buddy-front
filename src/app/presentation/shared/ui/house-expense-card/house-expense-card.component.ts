@@ -6,7 +6,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { HouseExpense } from '@domain/entities';
+import { FinancialActivity, FinancialActivityType } from '@domain/entities';
 import { ExpenseService } from '@application/use-cases';
 
 @Component({
@@ -21,37 +21,31 @@ import { ExpenseService } from '@application/use-cases';
     MatDialogModule
   ],
   template: `
-    <mat-card class="transaction-card expense" [matContextMenuTriggerFor]="contextMenu">
+    <mat-card class="transaction-card" [class.expense]="activity.type === activityType.EXPENSE" [class.settlement]="activity.type === activityType.SETTLEMENT" [matContextMenuTriggerFor]="contextMenu">
       <mat-card-content>
         <div class="transaction-content">
           <div class="transaction-left">
             <div class="transaction-icon">
-              <mat-icon class="expense-icon">trending_down</mat-icon>
-              @if (payerPicture) {
-                <img class="payer-avatar" [src]="payerPicture" alt="payer" />
-              } @else {
+              <mat-icon [class.expense-icon]="activity.type === activityType.EXPENSE" [class.settlement-icon]="activity.type === activityType.SETTLEMENT">
+                {{ activity.type === activityType.EXPENSE ? 'trending_down' : 'account_balance' }}
+              </mat-icon>
+              @if (activity.paidByPicture) {
+                <img class="payer-avatar" [src]="activity.paidByPicture" alt="payer" />
+              } @else if (activity.paidByName) {
                 <span class="payer-avatar initials">{{ payerInitials() }}</span>
               }
             </div>
           </div>
           <div class="transaction-details">
-            <div class="transaction-description">{{ expense.description || '-' }}</div>
-            <div class="transaction-payer">
-              <!-- Pagó: -->
-              <span class="payer">
-                <span class="payer-name">{{ payer }}</span>
-                <!-- @if (payerPicture) {
-                  <img class="payer-avatar" [src]="payerPicture" alt="payer" />
-                } @else {
-                  <span class="payer-avatar initials">{{ payerInitials() }}</span>
-                } -->
-              </span>
-            </div>
-            <div class="transaction-date">{{ expense.date | date:'dd/MM/yyyy HH:mm' }}</div>
+            <div class="transaction-description">{{ activity.description || '-' }}</div>
+            @if (activity.paidByName) {
+              <span class="payer-name"> {{ activity.paidByName }}</span>
+            }
+            <div class="transaction-date">{{ activity.date | date:'dd/MM/yyyy HH:mm' }}</div>
           </div>
           <div class="transaction-amount-container">
-            <div class="transaction-amount expense-amount">
-              {{ expense.amount | currency:'ARS':'symbol':'1.2-2' }}
+            <div class="transaction-amount" [class.expense-amount]="activity.type === activityType.EXPENSE" [class.settlement-amount]="activity.type === activityType.SETTLEMENT">
+              {{ activity.amount | currency:'ARS':'symbol':'1.2-2' }}
             </div>
           </div>
         </div>
@@ -59,7 +53,7 @@ import { ExpenseService } from '@application/use-cases';
     </mat-card>
 
     <mat-menu #contextMenu="matMenu">
-      <button mat-menu-item (click)="onDelete()" class="delete-button">
+      <button mat-menu-item *ngIf="activity.type === activityType.EXPENSE" (click)="onDelete()" class="delete-button">
         <mat-icon class="delete-icon">delete</mat-icon>
         Eliminar
       </button>
@@ -119,23 +113,24 @@ import { ExpenseService } from '@application/use-cases';
   `]
 })
 export class HouseExpenseCardComponent {
-  @Input({ required: true }) expense!: HouseExpense;
-  @Input({ required: true }) payer!: string;
-  @Input() payerPicture?: string;
+  @Input({ required: true }) activity!: FinancialActivity;
   @Output() deleted = new EventEmitter<void>();
+
+  protected activityType = FinancialActivityType;
 
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private expenseService = inject(ExpenseService);
 
   payerInitials(): string {
-    const name = (this.payer || '').trim();
+    const name = (this.activity.paidByName || '').trim();
     if (!name) return '';
     const parts = name.split(/\s+/);
     return (parts[0]?.[0] || '').concat(parts[1]?.[0] || '').toUpperCase();
   }
 
   onDelete() {
+    if (this.activity.type !== FinancialActivityType.EXPENSE) return;
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Eliminar gasto',
@@ -147,7 +142,7 @@ export class HouseExpenseCardComponent {
 
     ref.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
-      this.expenseService.deleteExpense(this.expense.id).subscribe({
+      this.expenseService.deleteExpense(this.activity.id).subscribe({
         next: () => {
           this.snackBar.open('Gasto eliminado', 'Cerrar', { duration: 2500 });
           this.deleted.emit();
