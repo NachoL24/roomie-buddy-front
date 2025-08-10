@@ -31,6 +31,16 @@ export class FinancialActivityRestClient extends FinancialActivityRepository {
     }
 
     return this.http.get<FinancialActivitiesPageResponseDto>(`${this.apiBaseUrl}/financial-activities`, { params: httpParams })
-      .pipe(map(a => FinancialActivityMapper.pageFromResponse(a) ));
+      .pipe(map(a => FinancialActivityMapper.pageFromResponse(a)));
+  }
+
+  getHouseFinancialActivities(houseId: number, startDate?: string, endDate?: string): Observable<FinancialActivity[]> {
+    let httpParams = new HttpParams();
+    if (startDate) httpParams = httpParams.set('startDate', startDate);
+    if (endDate) httpParams = httpParams.set('endDate', endDate);
+    const url = `${this.apiBaseUrl}/expenses/house/by-house/${houseId}`;
+    return this.http
+      .get<any[]>(url, { params: httpParams })
+      .pipe(map(items => items.map(FinancialActivityMapper.fromResponse)));
   }
 }

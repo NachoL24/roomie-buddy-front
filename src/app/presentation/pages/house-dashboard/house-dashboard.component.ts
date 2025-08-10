@@ -1,20 +1,19 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { HouseService, ExpenseService } from '@application/use-cases';
-import { House, HouseExpense } from '@domain/entities';
-import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense-card/house-expense-card.component';
+import { HouseService, FinancialActivityService } from '@application/use-cases';
+import { FinancialActivity, FinancialActivityType, House } from '@domain/entities';
 import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
 import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard/invite-member-dialog.component';
 
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, HouseExpenseCardComponent],
+  imports: [CommonModule, CurrencyPipe, DatePipe, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -29,15 +28,35 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
               New Expense
             </button>
           </div>
-          @if (expenses().length) {
+          @if (activities().length) {
             <div class="card-list">
-              @for (ex of expenses(); track ex.id) {
-                <app-house-expense-card
-                  [expense]="ex"
-                  [payer]="payerName(ex.paidById)"
-                  [payerPicture]="payerPicture(ex.paidById)"
-                  (deleted)="refresh(house()!.id)"
-                />
+              @for (act of activities(); track act.id) {
+                <div class="activity-card" [class.expense]="act.type === activityType.EXPENSE" [class.settlement]="act.type === activityType.SETTLEMENT">
+                  <div class="transaction-content">
+                    <div class="transaction-left">
+                      <div class="transaction-icon">
+                        <mat-icon [class.expense-icon]="act.type === activityType.EXPENSE" [class.settlement-icon]="act.type === activityType.SETTLEMENT">
+                          {{ act.type === activityType.EXPENSE ? 'trending_down' : 'account_balance' }}
+                        </mat-icon>
+                        @if (act.paidByPicture) {
+                          <img class="payer-avatar" [src]="act.paidByPicture" alt="payer" />
+                        } @else if (act.paidByName) {
+                          <span class="payer-avatar initials">{{ initialsFromName(act.paidByName) }}</span>
+                        }
+                      </div>
+                    </div>
+                    <div class="transaction-details">
+                      <div class="transaction-description">{{ act.description || '-' }}</div>
+                      <div class="transaction-payer" *ngIf="act.paidByName">Pagó: <span class="payer-name">{{ act.paidByName }}</span></div>
+                      <div class="transaction-date">{{ act.date | date:'dd/MM/yyyy HH:mm' }}</div>
+                    </div>
+                    <div class="transaction-amount-container">
+                      <div class="transaction-amount" [class.expense-amount]="act.type === activityType.EXPENSE" [class.settlement-amount]="act.type === activityType.SETTLEMENT">
+                        {{ act.amount | currency:'ARS':'symbol':'1.2-2' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               }
             </div>
           } @else {
@@ -96,6 +115,25 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
       gap: 24px;
     }
   .card-list { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .activity-card { border-left: 4px solid var(--mat-sys-outline-variant); border-radius: 12px; padding: 12px; }
+  .activity-card.expense { border-left-color: var(--mat-sys-primary); }
+  .activity-card.settlement { border-left-color: var(--mat-sys-secondary); }
+  .transaction-content { display: flex; align-items: center; gap: 16px; }
+  .transaction-left { display: flex; align-items: center; gap: 10px; height: 40px; }
+  .transaction-icon { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background-color: var(--mat-sys-surface-variant); }
+  .expense-icon { color: var(--mat-sys-error); }
+  .settlement-icon { color: var(--mat-sys-secondary); }
+  .payer-avatar { width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #f0d7cd; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; position: absolute; bottom: -6px; left: -6px; }
+  .payer-avatar.initials { font-size: 10px; }
+  .transaction-details { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .transaction-description { font-size: 1.05rem; font-weight: 500; color: var(--mat-sys-on-surface); }
+  .transaction-payer { font-size: 0.9rem; color: var(--mat-sys-on-surface-variant); }
+  .payer-name { color: var(--mat-sys-on-surface); font-weight: 500; }
+  .transaction-date { font-size: 0.9rem; color: var(--mat-sys-on-surface-variant); }
+  .transaction-amount-container { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .transaction-amount { font-size: 1.2rem; font-weight: 600; }
+  .expense-amount { color: var(--mat-sys-primary); }
+  .settlement-amount { color: var(--mat-sys-secondary); }
     .empty { padding: 24px; color: var(--mat-sys-on-surface-variant); border: 1px dashed var(--mat-sys-outline-variant); border-radius: 12px; }
     .members { display: flex; flex-direction: column; }
     .member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
@@ -127,13 +165,14 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
 export class HouseDashboardComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private houseService = inject(HouseService);
-  private expenseService = inject(ExpenseService);
+  private activityService = inject(FinancialActivityService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
 
   house = signal<House | null>(null);
-  expenses = signal<HouseExpense[]>([]);
+  activities = signal<FinancialActivity[]>([]);
+  protected activityType = FinancialActivityType;
 
   ngOnInit(): void {
     // Initial load
@@ -151,22 +190,25 @@ export class HouseDashboardComponent implements OnInit {
 
   refresh(houseId: number) {
     this.houseService.getHouseById(houseId).subscribe(h => { this.house.set(h); console.log("en componente:", h); });
-    this.expenseService.getHouseExpenses(houseId).subscribe(ex => this.expenses.set(ex));
-  }
-
-  payerName(roomieId: number): string {
-    const m = this.house()?.members.find(x => x.id === roomieId);
-    return m ? `${m.firstName} ${m.lastName}` : '—';
-  }
-
-  payerPicture(roomieId: number): string | undefined {
-    return this.house()?.members.find(x => x.id === roomieId)?.picture;
+    this.activityService.getHouseFinancialActivities(houseId).subscribe(list => {
+      const sorted = [...list].sort((a, b) => b.date.getTime() - a.date.getTime());
+      this.activities.set(sorted);
+    });
   }
 
   initials(first?: string, last?: string): string {
     const f = (first || '').trim();
     const l = (last || '').trim();
     return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  }
+
+  initialsFromName(name?: string): string {
+    const n = (name || '').trim();
+    if (!n) return '';
+    const parts = n.split(/\s+/);
+    const first = parts[0] || '';
+    const last = parts.length > 1 ? parts[parts.length - 1] : '';
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
   }
 
   openNewExpense() {

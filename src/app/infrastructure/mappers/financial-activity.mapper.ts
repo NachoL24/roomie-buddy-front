@@ -6,12 +6,19 @@ export class FinancialActivityMapper {
   static fromResponse(response: FinancialActivityResponseDto): FinancialActivity {
     return {
       id: response.id,
-      type: response.type === 'expense' ? FinancialActivityType.EXPENSE : FinancialActivityType.INCOME,
+      type:
+        response.type === 'expense'
+          ? FinancialActivityType.EXPENSE
+          : response.type === 'settlement'
+            ? FinancialActivityType.SETTLEMENT
+            : FinancialActivityType.INCOME,
       personal: response.personal,
-      houseName: response.houseName,
-      description: response.description,
+      houseName: response.houseName ?? undefined,
+      description: response.description ?? '',
       amount: response.amount,
-      date: new Date(response.date)
+      date: new Date(response.date),
+      paidByName: response.paidByName,
+      paidByPicture: response.paidByPicture
     };
   }
 

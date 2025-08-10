@@ -15,7 +15,7 @@ import { CreatePersonalExpenseData } from "@domain/repositories";
 import { CreateIncomeData } from "@domain/repositories";
 import { UpdateIncomeData } from "@domain/repositories/income.repository";
 import { UpdatePersonalExpenseData } from "@domain/repositories/expense.repository";
-import { FinancialActivity } from "@domain/entities/financial-activity.entity";
+import { FinancialActivity, FinancialActivityType } from "@domain/entities/financial-activity.entity";
 import { MatIconModule } from "@angular/material/icon";
 
 @Component({
@@ -187,7 +187,8 @@ export class NewTransactionDialogComponent {
       this.isEditMode = true;
       const activity = this.data.activity;
       this.currentActivityId = activity.id;
-      this.currentType = activity.type;
+      const typeStr = this.toStringType(activity.type);
+      this.currentType = typeStr;
 
       // Prefill form
       const activityDate = new Date(activity.date);
@@ -195,7 +196,7 @@ export class NewTransactionDialogComponent {
       this.transactionForm.patchValue({
         description: activity.description,
         amount: activity.amount,
-        type: activity.type,
+        type: typeStr ?? '',
         date: activityDate,
         time: timeStr
       });
@@ -349,6 +350,17 @@ export class NewTransactionDialogComponent {
     // Include disabled controls (like 'type' in edit mode)
     const raw = this.transactionForm.getRawValue();
     return raw as { description: string; amount: number; type: 'income' | 'expense'; date: Date; time?: string };
+  }
+
+  private toStringType(t: FinancialActivityType): 'income' | 'expense' | null {
+    switch (t) {
+      case FinancialActivityType.EXPENSE:
+        return 'expense';
+      case FinancialActivityType.INCOME:
+        return 'income';
+      default:
+        return null;
+    }
   }
 
   private formatTime(date: Date): string {

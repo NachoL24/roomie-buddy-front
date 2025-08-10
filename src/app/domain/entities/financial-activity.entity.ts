@@ -6,9 +6,12 @@ export interface FinancialActivity {
   description: string;
   amount: number;
   date: Date;
+  paidByName?: string;
+  paidByPicture?: string;
 }
 
 export enum FinancialActivityType {
   EXPENSE = 'expense',
-  INCOME = 'income'
+  INCOME = 'income',
+  SETTLEMENT = 'settlement'
 }

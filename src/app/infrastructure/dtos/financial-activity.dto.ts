@@ -1,12 +1,14 @@
 // Financial Activity DTOs
 export interface FinancialActivityResponseDto {
   id: number;
-  type: 'expense' | 'income';
+  type: 'expense' | 'settlement' | 'income';
   personal: boolean;
-  houseName?: string;
-  description: string;
+  houseName?: string | null;
+  description?: string;
   amount: number;
   date: string;
+  paidByName?: string;
+  paidByPicture?: string;
 }
 
 export interface FinancialActivitiesPageResponseDto {

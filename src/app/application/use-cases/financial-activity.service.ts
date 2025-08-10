@@ -5,12 +5,16 @@ import { FinancialActivity } from '../../domain/entities/financial-activity.enti
 import { Page } from '@domain/entities/page.entity';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class FinancialActivityService {
-    constructor(private financialActivityRepository: FinancialActivityRepository) { }
+  constructor(private financialActivityRepository: FinancialActivityRepository) { }
 
-    getFinancialActivities(params?: GetFinancialActivitiesParams): Observable<Page<FinancialActivity>> {
-        return this.financialActivityRepository.getFinancialActivities(params);
-    }
+  getFinancialActivities(params?: GetFinancialActivitiesParams): Observable<Page<FinancialActivity>> {
+    return this.financialActivityRepository.getFinancialActivities(params);
+  }
+
+  getHouseFinancialActivities(houseId: number, startDate?: string, endDate?: string): Observable<FinancialActivity[]> {
+    return this.financialActivityRepository.getHouseFinancialActivities(houseId, startDate, endDate);
+  }
 }
