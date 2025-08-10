@@ -20,4 +20,8 @@ export class UserService {
   getOrCreateUserFromBackend(): Observable<User> {
     return this.userRepository.getOrCreateUserFromBackend();
   }
+
+  findUserByEmail(email: string): Observable<User[]> {
+    return this.userRepository.findUserByEmail(email);
+  }
 }
