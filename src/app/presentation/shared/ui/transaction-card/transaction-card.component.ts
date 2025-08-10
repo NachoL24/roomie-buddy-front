@@ -34,6 +34,13 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
           </div>
           <div class="transaction-details">
             <div class="transaction-description">{{ activity.description }}</div>
+            @if (activity.personal) {
+              <div class="transaction-house-name">Personal</div>
+            } @else if (activity.houseName != null) {
+              <div class="transaction-house-name">{{ activity.houseName }}</div>
+            } @else {
+              <div class="transaction-house-name">Compartido</div>
+            }
             <div class="transaction-date">{{ activity.date | date:'dd/MM/yyyy HH:mm' }}</div>
           </div>
           <div class="transaction-amount-container">
@@ -103,18 +110,18 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
     }
 
     .transaction-description {
       font-size: 1.1rem;
       font-weight: 500;
-      color: var(--mat-sys-on-surface);
+      color: var(--mat-sys-on-background);
     }
 
     .transaction-date {
+      margin-top: 2px;
       font-size: 0.9rem;
-      color: var(--mat-sys-on-surface-variant);
+      color: var(--mat-sys-on-background);
     }
 
     .transaction-amount-container {
