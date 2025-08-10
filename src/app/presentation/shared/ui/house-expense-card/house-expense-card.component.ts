@@ -27,12 +27,15 @@ import { ExpenseService } from '@application/use-cases';
           <div class="transaction-left">
             <div class="transaction-icon">
               <mat-icon [class.expense-icon]="activity.type === activityType.EXPENSE" [class.settlement-icon]="activity.type === activityType.SETTLEMENT">
-                {{ activity.type === activityType.EXPENSE ? 'trending_down' : 'account_balance' }}
+                {{ activity.type === activityType.EXPENSE ? 'trending_down' : 'swap_horiz' }}
               </mat-icon>
               @if (activity.paidByPicture) {
                 <img class="payer-avatar" [src]="activity.paidByPicture" alt="payer" />
               } @else if (activity.paidByName) {
                 <span class="payer-avatar initials">{{ payerInitials() }}</span>
+              }
+              @if (activity.type === activityType.SETTLEMENT && activity.paidToPicture) {
+                <img class="paid-avatar" [src]="activity.paidToPicture" alt="payer" />
               }
             </div>
           </div>
@@ -67,7 +70,7 @@ import { ExpenseService } from '@application/use-cases';
   styles: [`
     .transaction-card { transition: all 0.2s ease; cursor: pointer; }
     .transaction-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .transaction-card.expense { border-left: 4px solid var(--mat-sys-primary); }
+    .transaction-card.expense, .transaction-card.settlement { border-left: 4px solid var(--mat-sys-primary); }
     .transaction-content { display: flex; align-items: center; gap: 16px; }
   .transaction-left { display: flex; align-items: center; gap: 10px; height: 60px; }
   .transaction-icon {
@@ -80,7 +83,7 @@ import { ExpenseService } from '@application/use-cases';
   border-radius: 50%;
   background-color: var(--mat-sys-surface-variant);
 }
-    .expense-icon { color: var(--mat-sys-error); }
+    .expense-icon, .settlement-icon { color: var(--mat-sys-primary); }
     .transaction-details { flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .transaction-description { font-size: 1.1rem; font-weight: 500; color: var(--mat-sys-on-surface); }
     .transaction-date { font-size: 0.9rem; color: var(--mat-sys-on-surface-variant); }
@@ -101,12 +104,27 @@ import { ExpenseService } from '@application/use-cases';
   bottom: -8px;
   left: -2px;
 }
+.paid-avatar {
+  width: 24px; /* más pequeño que el icono */
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0d7cd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #6a4a3c;
+  position: absolute;
+  bottom: -8px;
+  right: -2px;
+}
     .payer-avatar.initials { font-size: 10px; }
     .payer-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .payer-name { color: var(--mat-sys-on-surface); font-weight: 500; }
     .transaction-amount-container { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
     .transaction-amount { font-size: 1.3rem; font-weight: 600; }
-    .expense-amount { color: var(--mat-sys-primary); }
+    .expense-amount, .settlement-amount { color: var(--mat-sys-primary); }
     .delete-button, .delete-icon { color: var(--mat-sys-error); }
     .delete-button:hover { background-color: var(--mat-sys-on-error); }
     @media (max-width: 768px) {
@@ -128,10 +146,16 @@ export class HouseExpenseCardComponent {
   private expenseService = inject(ExpenseService);
 
   payerInitials(): string {
-    const name = (this.activity.paidByName || '').trim();
-    if (!name) return '';
-    const parts = name.split(/\s+/);
-    return (parts[0]?.[0] || '').concat(parts[1]?.[0] || '').toUpperCase();
+    return this.initialsFrom(this.activity.paidByName);
+  }
+
+  initialsFrom(name?: string): string {
+    const n = (name || '').trim();
+    if (!n) return '';
+    const parts = n.split(/\s+/);
+    const first = parts[0] || '';
+    const last = parts.length > 1 ? parts[parts.length - 1] : '';
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
   }
 
   onDelete() {
@@ -161,6 +185,6 @@ export class HouseExpenseCardComponent {
   }
 
   onEdit() {
-    
+
   }
 }

@@ -18,7 +18,9 @@ export class FinancialActivityMapper {
       amount: response.amount,
       date: new Date(response.date),
       paidByName: response.paidByName,
-      paidByPicture: response.paidByPicture
+      paidByPicture: response.paidByPicture,
+      paidToName: response.paidToName,
+      paidToPicture: response.paidToPicture
     };
   }
 

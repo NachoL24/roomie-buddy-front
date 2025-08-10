@@ -9,6 +9,8 @@ export interface FinancialActivityResponseDto {
   date: string;
   paidByName?: string;
   paidByPicture?: string;
+  paidToName?: string; // only for settlements
+  paidToPicture?: string; // only for settlements
 }
 
 export interface FinancialActivitiesPageResponseDto {

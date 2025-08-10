@@ -8,6 +8,8 @@ export interface FinancialActivity {
   date: Date;
   paidByName?: string;
   paidByPicture?: string;
+  paidToName?: string;
+  paidToPicture?: string;
 }
 
 export enum FinancialActivityType {
