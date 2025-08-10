@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NewTransactionDialogComponent } from '../../../pages/dashboard/components/new-transaction-dialog.ng';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { IncomeService, PersonalExpenseService } from '../../../..';
+import { IncomeService, PersonalExpenseService, GlobalUserService } from '../../../..';
 
 @Component({
   selector: 'app-transaction-card',
@@ -22,11 +22,15 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
     MatDialogModule
   ],
   template: `
-    <mat-card class="transaction-card" [class.income]="activity.type === 'income'" [class.expense]="activity.type === 'expense'" [matContextMenuTriggerFor]="contextMenu">
+    <mat-card
+      class="transaction-card"
+      [class.income]="isIncoming"
+      [class.expense]="isOutgoing"
+      [matContextMenuTriggerFor]="canEdit ? contextMenu : null">
       <mat-card-content>
         <div class="transaction-content">
           <div class="transaction-icon">
-            @if (activity.type === 'income') {
+            @if (isIncoming) {
               <mat-icon class="income-icon">trending_up</mat-icon>
             } @else {
               <mat-icon class="expense-icon">trending_down</mat-icon>
@@ -41,11 +45,20 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
             } @else {
               <div class="transaction-house-name">Compartido</div>
             }
+            @if (activity.type === 'settlement') {
+              <div class="transaction-counterparty">
+                @if (isIncoming && activity.paidByName) {
+                  De: {{ activity.paidByName }}
+                } @else if (isOutgoing && activity.paidToName) {
+                  Para: {{ activity.paidToName }}
+                }
+              </div>
+            }
             <div class="transaction-date">{{ activity.date | date:'dd/MM/yyyy HH:mm' }}</div>
           </div>
           <div class="transaction-amount-container">
-            <div class="transaction-amount" [class.income-amount]="activity.type === 'income'" [class.expense-amount]="activity.type === 'expense'">
-              {{ activity.type === 'income' ? '+' : '-' }}{{ activity.amount | currency:'ARS':'symbol':'1.2-2' }}
+            <div class="transaction-amount" [class.income-amount]="isIncoming" [class.expense-amount]="isOutgoing">
+              {{ isIncoming ? '+' : '-' }}{{ activity.amount | currency:'ARS':'symbol':'1.2-2' }}
             </div>
           </div>
         </div>
@@ -53,11 +66,11 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
     </mat-card>
 
     <mat-menu #contextMenu="matMenu">
-      <button mat-menu-item (click)="onEdit()">
+      <button mat-menu-item (click)="onEdit()" [disabled]="!canEdit">
         <mat-icon>edit</mat-icon>
         Edit
       </button>
-      <button mat-menu-item (click)="onDelete()" class="delete-button">
+      <button mat-menu-item (click)="onDelete()" class="delete-button" [disabled]="!canEdit">
         <mat-icon class="delete-icon">delete</mat-icon>
         Delete
       </button>
@@ -118,6 +131,12 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
       color: var(--mat-sys-on-background);
     }
 
+    .transaction-counterparty {
+      margin-top: 2px;
+      font-size: 0.9rem;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
     .transaction-date {
       margin-top: 2px;
       font-size: 0.9rem;
@@ -172,15 +191,57 @@ import { IncomeService, PersonalExpenseService } from '../../../..';
     }
   `]
 })
-export class TransactionCardComponent {
+export class TransactionCardComponent implements OnChanges {
   @Input({ required: true }) activity!: FinancialActivity;
   @Output() edited = new EventEmitter<void>();
   private dialog = inject(MatDialog);
   private personalExpenseService = inject(PersonalExpenseService);
   private incomeService = inject(IncomeService);
   private snackBar = inject(MatSnackBar);
+  private globalUser = inject(GlobalUserService);
+
+  isIncoming = false;
+  isOutgoing = false;
+
+  get canEdit(): boolean {
+    // Only allow editing/deleting personal income/expense (no settlements)
+    return !!this.activity?.personal && (this.activity.type === 'income' || this.activity.type === 'expense');
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['activity'] && this.activity) {
+      this.computeDirection();
+    }
+  }
+
+  private computeDirection() {
+    const myId = this.globalUser.user()?.id;
+    // Reset
+    this.isIncoming = false;
+    this.isOutgoing = false;
+
+    if (this.activity.type === 'income') {
+      this.isIncoming = true;
+      return;
+    }
+
+    if (this.activity.type === 'expense') {
+      this.isOutgoing = true;
+      return;
+    }
+
+    // Settlement: direction depends on who paid/sent to whom relative to current user
+    if (this.activity.type === 'settlement') {
+      if (myId && this.activity.paidToId && this.activity.paidToId === myId) {
+        this.isIncoming = true;
+      } else if (myId && this.activity.paidById && this.activity.paidById === myId) {
+        this.isOutgoing = true;
+      }
+    }
+  }
 
   onEdit() {
+    if (!this.canEdit) return;
     const ref = this.dialog.open(NewTransactionDialogComponent, {
       data: { activity: this.activity }
     });
@@ -194,6 +255,7 @@ export class TransactionCardComponent {
   }
 
   onDelete() {
+    if (!this.canEdit) return;
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Eliminar transacción',

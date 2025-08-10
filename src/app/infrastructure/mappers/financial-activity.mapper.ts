@@ -17,10 +17,12 @@ export class FinancialActivityMapper {
       description: response.description ?? '',
       amount: response.amount,
       date: new Date(response.date),
+      paidById: response.paidById,
       paidByName: response.paidByName,
       paidByPicture: response.paidByPicture,
       paidToName: response.paidToName,
-      paidToPicture: response.paidToPicture
+      paidToPicture: response.paidToPicture,
+      paidToId: response.paidToId
     };
   }
 

@@ -6,10 +6,12 @@ export interface FinancialActivity {
   description: string;
   amount: number;
   date: Date;
+  paidById?: number;
   paidByName?: string;
   paidByPicture?: string;
   paidToName?: string;
   paidToPicture?: string;
+  paidToId?: number;
 }
 
 export enum FinancialActivityType {

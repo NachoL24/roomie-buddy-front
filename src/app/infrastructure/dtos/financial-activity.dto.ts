@@ -7,10 +7,12 @@ export interface FinancialActivityResponseDto {
   description?: string;
   amount: number;
   date: string;
+  paidById?: number;
   paidByName?: string;
   paidByPicture?: string;
   paidToName?: string; // only for settlements
   paidToPicture?: string; // only for settlements
+  paidToId?: number;
 }
 
 export interface FinancialActivitiesPageResponseDto {
