@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -130,16 +130,23 @@ export class HouseDashboardComponent implements OnInit {
   private expenseService = inject(ExpenseService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private router = inject(Router);
 
   house = signal<House | null>(null);
   expenses = signal<HouseExpense[]>([]);
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    const houseId = Number(idParam);
-    if (!houseId) return;
+    // Initial load
+    const initialId = Number(this.route.snapshot.paramMap.get('id'));
+    if (initialId) this.refresh(initialId);
 
-    this.refresh(houseId);
+    // Also refresh on every navigation end (covers same-URL navigations)
+    this.router.events.subscribe(evt => {
+      if (evt instanceof NavigationEnd) {
+        const id = Number(this.route.snapshot.paramMap.get('id'));
+        if (id) this.refresh(id);
+      }
+    });
   }
 
   refresh(houseId: number) {

@@ -1,5 +1,5 @@
 import { ApplicationConfig, InjectionToken, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withRouterConfig } from '@angular/router';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, NativeDateAdapter } from '@angular/material/core';
 
 import { routes } from './app.routes';
@@ -73,7 +73,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withRouterConfig({ onSameUrlNavigation: 'reload' })
+    ),
     provideHttpClient(withInterceptors([authHttpInterceptorFn])),
     provideAuth0({
       domain: environment.auth0.domain,
