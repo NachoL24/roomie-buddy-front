@@ -10,6 +10,7 @@ import { FinancialActivity, FinancialActivityType, House } from '@domain/entitie
 import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
 import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard/invite-member-dialog.component';
 import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense-card/house-expense-card.component';
+import { PayRatioDialogComponent } from './pay-ratio-dialog.component';
 
 @Component({
   selector: 'app-house-dashboard',
@@ -210,6 +211,16 @@ export class HouseDashboardComponent implements OnInit {
   }
 
   openSettings() {
+    if (!this.house) return;
+    const ref = this.dialog.open(PayRatioDialogComponent, {
+      data: { houseId: this.house()!.id, members: this.house()!.members }
+    });
+    ref.afterClosed().subscribe(ok => {
+      if (ok && this.house) {
+        this.snackBar.open('Ratios actualizados', 'Cerrar', { duration: 2500 });
+        this.refresh(this.house()!.id);
+      }
+    });
   }
 
 }
