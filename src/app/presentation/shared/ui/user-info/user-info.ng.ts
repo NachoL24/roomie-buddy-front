@@ -29,7 +29,7 @@ import { User } from '@domain/entities';
     .row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
     .user-avatar {
