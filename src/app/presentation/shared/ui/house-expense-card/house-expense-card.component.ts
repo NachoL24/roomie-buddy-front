@@ -99,8 +99,8 @@ import { ExpenseService } from '@application/use-cases';
   font-weight: 600;
   color: #6a4a3c;
   position: absolute;
-  bottom: -8px; /* esquina inferior */
-  left: -2px;  /* esquina derecha */
+  bottom: -8px;
+  left: -2px;
 }
     .payer-avatar.initials { font-size: 10px; }
     .payer-avatar img { width: 100%; height: 100%; object-fit: cover; }
