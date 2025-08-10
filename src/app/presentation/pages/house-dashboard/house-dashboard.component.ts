@@ -46,7 +46,12 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
         </section>
 
         <aside class="members">
-          <h2>Members</h2>
+          <div class="header">
+            <h2 class="table-title">Members</h2>
+            <button matIconButton color="primary" (click)="openInvite()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
           <ul class="member-list">
             <li *ngFor="let m of house()?.members" class="member-item">
                @if (m.picture) {
@@ -62,7 +67,6 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
               </div>
             </li>
           </ul>
-          <button mat-stroked-button class="invite" (click)="openInvite()">Invite</button>
         </aside>
       </div>
     </div>
@@ -72,22 +76,36 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
   `,
   styles: [`
     :host { display: block; }
-    .house-dashboard { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+    .house-dashboard {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+    }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     h1 { font-size: 32px; margin: 0; }
     .table-title { margin: 0; }
-    .content { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
-     .members h2 { margin: 0 0 8px; }
+    .content {
+      display: grid;
+      grid-template-columns: 1fr minmax(200px, 260px);
+      gap: 24px;
+    }
   .card-list { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .empty { padding: 24px; color: var(--mat-sys-on-surface-variant); border: 1px dashed var(--mat-sys-outline-variant); border-radius: 12px; }
-    .members { display: flex; flex-direction: column; gap: 12px; }
-    .member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+    .members { display: flex; flex-direction: column; }
+    .member-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
     .member-item { display: flex; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; border: 1px solid var(--mat-sys-outline-variant); }
     .avatar { width: 40px; height: 40px; border-radius: 50%; background: #f0d7cd; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
     .info .name { font-weight: 600; }
     .text-muted { color: var(--mat-sys-on-surface-variant); margin-top: 2px; font-size: 12px; }
     .invite { width: 100%; }
     .loading { color: var(--mat-sys-on-surface-variant); }
+    @media (max-width: 870px) {
+      .content {
+        grid-template-columns: 1fr;
+        margin-bottom: 16px;
+      }
+    }
   `]
 })
 export class HouseDashboardComponent implements OnInit {
