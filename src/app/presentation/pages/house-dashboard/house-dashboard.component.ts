@@ -31,13 +31,14 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
           </div>
           @if (expenses().length) {
             <div class="card-list">
-              <app-house-expense-card
-                *ngFor="let ex of expenses()"
-                [expense]="ex"
-                [payer]="payerName(ex.paidById)"
-                [payerPicture]="payerPicture(ex.paidById)"
-                (deleted)="refresh(house()!.id)"
-              />
+              @for (ex of expenses(); track ex.id) {
+                <app-house-expense-card
+                  [expense]="ex"
+                  [payer]="payerName(ex.paidById)"
+                  [payerPicture]="payerPicture(ex.paidById)"
+                  (deleted)="refresh(house()!.id)"
+                />
+              }
             </div>
           } @else {
             <div class="empty">No transactions yet</div>
