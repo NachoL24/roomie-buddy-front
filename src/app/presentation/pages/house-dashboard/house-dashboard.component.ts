@@ -200,10 +200,10 @@ export class HouseDashboardComponent implements OnInit {
 
   openInvite() {
     if (!this.house) return;
-    const ref = this.dialog.open(InviteMemberDialogComponent, { data: { houseId: this.house()!.id } });
+    const ref = this.dialog.open(InviteMemberDialogComponent, { data: { houseId: this.house()!.id, roomies: this.house()!.members } });
     ref.afterClosed().subscribe(ok => {
       if (ok && this.house) {
-        this.snackBar.open('Invitation sent', 'Close', { duration: 2500 });
+        this.snackBar.open('Invitación enviada', 'Cerrar');
         this.refresh(this.house()!.id);
       }
     });
