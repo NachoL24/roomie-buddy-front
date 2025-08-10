@@ -53,10 +53,15 @@ import { ExpenseService } from '@application/use-cases';
     </mat-card>
 
     <mat-menu #contextMenu="matMenu">
-      <button mat-menu-item *ngIf="activity.type === activityType.EXPENSE" (click)="onDelete()" class="delete-button">
+      <button mat-menu-item (click)="onEdit()" class="edit-button">
+        <mat-icon class="edit-icon">edit</mat-icon>
+        Editar
+      </button>
+      <button mat-menu-item (click)="onDelete()" class="delete-button">
         <mat-icon class="delete-icon">delete</mat-icon>
         Eliminar
       </button>
+
     </mat-menu>
   `,
   styles: [`
@@ -153,5 +158,9 @@ export class HouseExpenseCardComponent {
         }
       });
     });
+  }
+
+  onEdit() {
+    
   }
 }
