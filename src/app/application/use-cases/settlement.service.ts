@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SettlementRepository, CreateSettlementData } from '../../domain/repositories';
-import { Settlement, BalanceSummary } from '../../domain/entities';
+import { Settlement, BalanceSummary, HouseBalanceSummary } from '../../domain/entities';
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +19,10 @@ export class SettlementService {
 
     getHouseBalanceSummary(houseId: number): Observable<BalanceSummary> {
         return this.settlementRepository.getBalanceSummary(houseId);
+    }
+
+    getMyHouseBalanceSummary(houseId: number): Observable<HouseBalanceSummary> {
+        return this.settlementRepository.getMyHouseBalanceSummary(houseId);
     }
 
     /**

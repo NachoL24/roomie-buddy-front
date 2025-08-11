@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SettlementRepository, CreateSettlementData } from '../../domain/repositories';
-import { Settlement, BalanceSummary } from '../../domain/entities';
+import { Settlement, BalanceSummary, HouseBalanceSummary } from '../../domain/entities';
 import { SettlementMapper } from '../mappers';
-import { SettlementResponseDto, BalanceSummaryResponseDto } from '../dtos';
+import { SettlementResponseDto, BalanceSummaryResponseDto, HouseBalanceSummaryResponseDto } from '../dtos';
 import { API_BASE_URL } from '../../app.config';
 
 @Injectable({
@@ -33,5 +33,10 @@ export class SettlementRestClient extends SettlementRepository {
     getBalanceSummary(houseId: number): Observable<BalanceSummary> {
         return this.http.get<BalanceSummaryResponseDto>(`${this.apiBaseUrl}/settlements/balance/${houseId}`)
             .pipe(map(SettlementMapper.balanceSummaryFromResponse));
+    }
+
+    getMyHouseBalanceSummary(houseId: number): Observable<HouseBalanceSummary> {
+        return this.http.get<HouseBalanceSummaryResponseDto>(`${this.apiBaseUrl}/settlements/balance/${houseId}`)
+            .pipe(map(s => SettlementMapper.houseBalanceSummaryFromResponse(s)));
     }
 }

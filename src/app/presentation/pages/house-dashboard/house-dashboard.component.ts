@@ -11,15 +11,17 @@ import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashbo
 import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard/invite-member-dialog.component';
 import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense-card/house-expense-card.component';
 import { PayRatioDialogComponent } from './pay-ratio-dialog.component';
+import { HouseSettlementBalancesComponent } from './house-settlement-balances.component';
 
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, HouseExpenseCardComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent],
   template: `
   @if (house()) {
     <div class="house-dashboard">
         <h1>{{ house()?.name }}</h1>
+
 
       <div class="content">
         <section class="transactions">
@@ -68,8 +70,12 @@ import { PayRatioDialogComponent } from './pay-ratio-dialog.component';
               </div>
             </li>
           </ul>
+          <section class="balances-section">
+            <app-house-balance [house]="house()!"></app-house-balance>
+          </section>
         </aside>
       </div>
+
     </div>
           } @else {
             <div class="loading">Loading...</div>

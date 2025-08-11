@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Settlement, BalanceSummary } from '../../domain/entities';
+import { Settlement, BalanceSummary, HouseBalanceSummary } from '../../domain/entities';
 
 export interface CreateSettlementData {
     fromRoomieId: number;
@@ -13,4 +13,5 @@ export abstract class SettlementRepository {
     abstract createSettlement(data: CreateSettlementData): Observable<Settlement>;
     abstract getSettlementsByHouse(houseId: number): Observable<Settlement[]>;
     abstract getBalanceSummary(houseId: number): Observable<BalanceSummary>;
+    abstract getMyHouseBalanceSummary(houseId: number): Observable<HouseBalanceSummary>;
 }

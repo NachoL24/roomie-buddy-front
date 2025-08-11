@@ -1,5 +1,5 @@
-import { Settlement, BalanceSummary, RoomieBalance } from '../../domain/entities';
-import { SettlementResponseDto, BalanceSummaryResponseDto, RoomieBalanceResponseDto, CreateSettlementRequestDto } from '../dtos';
+import { Settlement, BalanceSummary, RoomieBalance, HouseBalanceSummary, BalanceDto as DomainBalanceDto, DetailedBalanceDto as DomainDetailedBalanceDto } from '../../domain/entities';
+import { SettlementResponseDto, BalanceSummaryResponseDto, RoomieBalanceResponseDto, CreateSettlementRequestDto, HouseBalanceSummaryResponseDto, HouseBalanceDtoResponse, DetailedBalanceItemResponse } from '../dtos';
 import { CreateSettlementData } from '../../domain/repositories';
 
 export class SettlementMapper {
@@ -42,5 +42,22 @@ export class SettlementMapper {
             houseId: data.houseId,
             description: data.description
         };
+    }
+
+    // New mappers for balance summary by user
+    static houseBalanceSummaryFromResponse(response: HouseBalanceSummaryResponseDto): HouseBalanceSummary {
+        return {
+            houseId: response.houseId,
+            myBalance: this.balanceDtoFromResponse(response.myBalance),
+            detailedBalances: response.detailedBalances.map(this.detailedBalanceFromResponse)
+        };
+    }
+
+    static balanceDtoFromResponse(response: HouseBalanceDtoResponse): DomainBalanceDto {
+        return { roomieId: response.roomieId, owesToMe: response.owesToMe, iOwe: response.iOwe, netBalance: response.netBalance };
+    }
+
+    static detailedBalanceFromResponse(response: DetailedBalanceItemResponse): DomainDetailedBalanceDto {
+        return { withRoomieId: response.withRoomieId, amount: response.amount, description: response.description };
     }
 }
