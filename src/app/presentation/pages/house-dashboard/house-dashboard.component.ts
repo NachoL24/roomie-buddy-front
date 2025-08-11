@@ -29,7 +29,7 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
             <h2 class="table-title">Transacciones</h2>
             <button mat-stroked-button color="primary" (click)="openNewExpense()">
               <mat-icon>add</mat-icon>
-              Nuevo gasto
+              Nueva Transacción
             </button>
           </div>
           @if (activities().length) {

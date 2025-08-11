@@ -13,6 +13,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
 import { ExpenseService } from '@application/use-cases';
 import { House } from '@domain/entities';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 interface DialogData { house: House; }
 
@@ -31,12 +32,20 @@ interface DialogData { house: House; }
     MatSlideToggleModule,
     MatRadioModule,
     MatDialogModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonToggleModule
   ],
   template: `
     <h2 mat-dialog-title class="title">Nuevo gasto de casa</h2>
     <div mat-dialog-content class="form">
-      <mat-form-field appearance="outline" class="first">
+
+      <div class="toggle-strip">
+        <mat-button-toggle-group class="mode" value="red">
+          <mat-button-toggle value="red">Gasto</mat-button-toggle>
+          <mat-button-toggle value="green">Transferencia</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+      <mat-form-field appearance="outline">
         <mat-label>Descripción</mat-label>
         <input matInput [(ngModel)]="description" required/>
       </mat-form-field>
@@ -124,6 +133,10 @@ interface DialogData { house: House; }
     </div>
   `,
   styles: [`
+  .toggle-strip { width: 100%; margin: 8px 0 20px 0; }
+  .mode { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 0 !important;}
+  .mode .mat-button-toggle { width: 100%; justify-content: center; }
+  .mode .mat-button-toggle-label-content { width: 100%; text-align: center; padding: 12px 0; }
       .form { display: flex; flex-direction: column; width: 520px; max-width: 92vw; padding: 0 16px 4px 16px; }
       .first {
         margin-top: 8px;
