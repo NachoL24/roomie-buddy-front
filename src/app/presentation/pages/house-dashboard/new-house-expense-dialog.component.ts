@@ -10,6 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatIconModule } from '@angular/material/icon';
 import { ExpenseService } from '@application/use-cases';
 import { House } from '@domain/entities';
 
@@ -29,7 +30,8 @@ interface DialogData { house: House; }
     MatNativeDateModule,
     MatSlideToggleModule,
     MatRadioModule,
-    MatDialogModule
+    MatDialogModule,
+    MatIconModule
   ],
   template: `
     <h2 mat-dialog-title class="title">Nuevo gasto de casa</h2>
@@ -73,7 +75,10 @@ interface DialogData { house: House; }
 
       <div class="custom-toggle">
         <span class="spacer"></span>
-        <mat-slide-toggle [(ngModel)]="customSplit" labelPosition="before">Dividir manualmente</mat-slide-toggle>
+        <button matButton="text" type="button" class="toggle-btn" (click)="customSplit = !customSplit">
+          <span class="toggle-text">{{ customSplit ? 'División automática' : 'Dividir manualmente' }}</span>
+          <mat-icon class="toggle-icon">{{ customSplit ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+        </button>
       </div>
 
       @if (customSplit) {
@@ -128,14 +133,23 @@ interface DialogData { house: House; }
         display: flex;
         width: 100%;
       }
+      .toggle-btn {
+        width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 4px;
+      }
+      .toggle-text { text-align: left; }
       .spacer {
           flex: 1 1 auto;
       }
-      .custom-split { display: flex; flex-direction: column; gap: 12px; padding: 8px 0; }
+      .custom-split { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; padding: 8px 0; }
       .mode { display: flex; gap: 16px; }
       .shares { display: flex; flex-direction: column; gap: 8px; }
       .share-row { display: grid; grid-template-columns: 1fr 200px auto; align-items: center; gap: 12px; }
-      .user { display: flex; align-items: center; gap: 8px; }
+      .user { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; margin-left: 12px }
       .avatar { width: 28px; height: 28px; border-radius: 50%; background: #f0d7cd; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
       .avatar.initials { font-size: 12px; }
       .name { font-weight: 500; }
