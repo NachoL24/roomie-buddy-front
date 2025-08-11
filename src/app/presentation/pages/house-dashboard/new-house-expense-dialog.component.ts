@@ -145,7 +145,7 @@ interface DialogData { house: House; }
       .spacer {
           flex: 1 1 auto;
       }
-      .custom-split { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; padding: 8px 0; }
+      .custom-split { margin-top: 12px; display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
       .mode { display: flex; gap: 16px; }
       .shares { display: flex; flex-direction: column; gap: 8px; }
       .share-row { display: grid; grid-template-columns: 1fr 200px auto; align-items: center; gap: 12px; }
