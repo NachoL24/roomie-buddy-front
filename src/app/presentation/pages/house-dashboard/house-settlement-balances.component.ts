@@ -29,7 +29,7 @@ import { House, HouseBalanceSummary } from "@domain/entities";
                     @if (e.amount > 0) {
                       <span class="positive">Te debe {{ e.amount | number:'1.2-2' }}</span>
                     } @else if (e.amount < 0) {
-                      <span class="negative">Debes {{ (-e.amount) | number:'1.2-2' }}</span>
+                      <span class="negative">Le debes {{ (-e.amount) | number:'1.2-2' }}</span>
                     } @else {
                       <span>Están al día</span>
                     }
