@@ -14,33 +14,22 @@ import { House, HouseBalanceSummary } from "@domain/entities";
       <h2>Balances de liquidación</h2>
       @if (data()) {
       <div>
-        <div class="details" *ngIf="owesMe().length || iOwe().length; else noDetails">
-          <div class="detail" *ngFor="let e of owesMe()">
-            <div class="person">
-              <ng-container *ngIf="e.member?.picture; else noPic1">
-                <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" />
-              </ng-container>
-              <ng-template #noPic1>
-                <div class="avatar">{{ initials(e.member?.firstName, e.member?.lastName) }}</div>
-              </ng-template>
+        <div class="details" *ngIf="entries().length; else noDetails">
+          <div class="detail" *ngFor="let e of entries()">
+            <ng-container *ngIf="e.member?.picture; else noPic">
+              <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" />
+            </ng-container>
+            <ng-template #noPic>
+              <div class="avatar">{{ initials(e.member?.firstName, e.member?.lastName) }}</div>
+            </ng-template>
+            <div class="person-details">
               <div class="name">{{ e.member?.firstName }} {{ e.member?.lastName }}</div>
+              <div class="status">
+                <span *ngIf="e.amount > 0" class="positive">Te debe {{ e.amount | number:'1.2-2' }}</span>
+                <span *ngIf="e.amount < 0" class="negative">Debes {{ (-e.amount) | number:'1.2-2' }}</span>
+                <span *ngIf="e.amount === 0">Están al día</span>
+              </div>
             </div>
-            <mat-icon class="positive">call_received</mat-icon>
-            <div class="desc">{{ e.description }}</div>
-            <div class="amount positive">{{ e.amount | number:'1.2-2' }}</div>
-          </div>
-          <div class="detail" *ngFor="let e of iOwe()">
-            <div class="person">
-              <ng-container *ngIf="e.member?.picture; else noPic2">
-                <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" />
-              </ng-container>
-              <ng-template #noPic2>
-                <div class="avatar">{{ initials(e.member?.firstName, e.member?.lastName) }}</div>
-              </ng-template>
-              <div class="name">{{ e.member?.firstName }} {{ e.member?.lastName }}</div>
-            </div>
-            <div class="desc">{{ e.description }}</div>
-            <div class="amount negative">{{ (e.amount) | number:'1.2-2' }}</div>
           </div>
         </div>
         <ng-template #noDetails>
@@ -65,11 +54,12 @@ import { House, HouseBalanceSummary } from "@domain/entities";
     .positive { color: var(--mat-sys-primary); }
     .negative { color: var(--mat-sys-error); }
     .details { display: grid; gap: 8px; }
-  .detail { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 8px; align-items: center; padding: 8px; border: 1px solid var(--mat-sys-outline-variant); border-radius: 8px; }
-  .person { display: flex; align-items: center; gap: 8px; }
+  .detail { display: flex; flex-direction: row; gap: 12px; align-items: center; padding: 10px; }
+  .person { display: flex; align-items: center; justify-content: start; }
   .avatar { width: 28px; height: 28px; border-radius: 50%; background: #f0d7cd; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
   h3 { margin: 8px 0 4px; font-size: 14px; color: var(--mat-sys-on-surface-variant); }
     .empty { color: var(--mat-sys-on-surface-variant); padding: 8px; }
+    .person-details { display: flex; flex-direction: column; gap: 0; }
   `]
 })
 export class HouseSettlementBalancesComponent implements OnInit, OnChanges {
@@ -83,7 +73,7 @@ export class HouseSettlementBalancesComponent implements OnInit, OnChanges {
   loading = signal<boolean>(false);
 
   // Derived computed lists with member info
-  private entries = computed(() => {
+  entries = computed(() => {
     const summary = this.data();
     const h = this.houseSig();
     if (!summary || !h) return [] as Array<{ id: number; amount: number; description: string; member?: House['members'][number] }>;
@@ -118,18 +108,18 @@ export class HouseSettlementBalancesComponent implements OnInit, OnChanges {
   });
 
   ngOnInit(): void {
-      const h = this.houseSig();
-      if (!h) return;
-      this.loading.set(true);
-      this.data.set(null);
+    const h = this.houseSig();
+    if (!h) return;
+    this.loading.set(true);
+    this.data.set(null);
     this.settlementService.getMyHouseBalanceSummary(h.id).subscribe(summary => {
-        console.log("Balance summary:", summary);
-        this.data.set(summary);
-        this.loading.set(false);
-      }, error => {
-        console.error("Error fetching balance summary:", error);
-        this.loading.set(false);
-      });
+      console.log("Balance summary:", summary);
+      this.data.set(summary);
+      this.loading.set(false);
+    }, error => {
+      console.error("Error fetching balance summary:", error);
+      this.loading.set(false);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
