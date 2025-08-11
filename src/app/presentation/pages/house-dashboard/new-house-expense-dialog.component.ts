@@ -1,61 +1,259 @@
-import { Component, Inject, inject } from '@angular/core';
+import { Component, Inject, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatRadioModule } from '@angular/material/radio';
 import { ExpenseService } from '@application/use-cases';
 import { House } from '@domain/entities';
 
 interface DialogData { house: House; }
 
 @Component({
-    selector: 'app-new-house-expense-dialog',
-    standalone: true,
-    imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
-    template: `
-    <h2 mat-dialog-title>New Expense</h2>
+  selector: 'app-new-house-expense-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSlideToggleModule,
+    MatRadioModule,
+    MatDialogModule
+  ],
+  template: `
+    <h2 mat-dialog-title>Nuevo gasto de casa</h2>
     <div mat-dialog-content class="form">
-      <mat-form-field appearance="fill">
-        <mat-label>Description</mat-label>
-        <input matInput [(ngModel)]="description">
+      <mat-form-field appearance="outline" class="first">
+        <mat-label>Descripción</mat-label>
+        <input matInput [(ngModel)]="description" />
       </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Amount</mat-label>
-        <input matInput type="number" [(ngModel)]="amount">
+
+      <div class="row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Monto</mat-label>
+          <input matInput type="number" min="0" step="0.01" [(ngModel)]="amount" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="date" />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Pagado por</mat-label>
+        <mat-select [(ngModel)]="paidById">
+          <mat-option *ngFor="let m of data.house.members" [value]="m.id">
+            <div class="option">
+              <img *ngIf="m.picture; else initialsTpl" class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
+              <ng-template #initialsTpl>
+                <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
+              </ng-template>
+              <span>{{ m.firstName }} {{ m.lastName }}</span>
+            </div>
+          </mat-option>
+        </mat-select>
       </mat-form-field>
+
+      <div class="custom-toggle">
+        <span class="spacer"></span>
+        <mat-slide-toggle [(ngModel)]="customSplit" labelPosition="before">Dividir manualmente</mat-slide-toggle>
+      </div>
+
+      <div *ngIf="customSplit" class="custom-split">
+        <div class="shares">
+          <div class="share-row" *ngFor="let s of shares; let i = index">
+            <div class="user">
+              <img *ngIf="s.picture; else initialsTpl2" class="avatar" [src]="s.picture!" [alt]="s.firstName + ' ' + s.lastName" />
+              <ng-template #initialsTpl2>
+                <div class="avatar initials">{{ initials(s.firstName, s.lastName) }}</div>
+              </ng-template>
+              <div class="name">{{ s.firstName }} {{ s.lastName }}</div>
+            </div>
+
+            <mat-form-field appearance="outline" class="share-input">
+              <mat-label>Monto</mat-label>
+              <input matInput type="number"
+                     [min]="0"
+                     [(ngModel)]="shares[i]['amount']"
+                     (ngModelChange)="onShareChange(i)"/>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
     </div>
-    <div mat-dialog-actions align="end">
-      <button mat-button (click)="close(false)">Cancel</button>
-      <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">Create</button>
+    <div mat-dialog-actions class="actions">
+      <div class="summary" *ngIf="amount">
+          <div [class.error]="!sharesValid()">
+            {{ summaryText()[0] }}
+          </div>
+          <div [class.error]="!sharesValid()">
+            {{ summaryText()[1] }}
+          </div>
+        </div>
+      <span class="spacer"></span>
+      <button mat-button (click)="close(false)">Cancelar</button>
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">Crear</button>
     </div>
   `,
-    styles: [`.form { display: flex; flex-direction: column; gap: 12px; width: 360px; }`]
+  styles: [`
+      .form { display: flex; flex-direction: column; gap: 12px; width: 520px; max-width: 92vw; padding: 0 16px 4px 16px; }
+      .first {
+        margin-top: 8px;
+      }
+      .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .custom-toggle {
+        display: flex;
+        width: 100%;
+      }
+      .spacer {
+          flex: 1 1 auto;
+      }
+      .custom-split { display: flex; flex-direction: column; gap: 12px; padding: 8px 0; }
+      .mode { display: flex; gap: 16px; }
+      .shares { display: flex; flex-direction: column; gap: 8px; }
+      .share-row { display: grid; grid-template-columns: 1fr 200px auto; align-items: center; gap: 12px; }
+      .user { display: flex; align-items: center; gap: 8px; }
+      .avatar { width: 28px; height: 28px; border-radius: 50%; background: #f0d7cd; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
+      .avatar.initials { font-size: 12px; }
+      .name { font-weight: 500; }
+      .option { display: flex; align-items: center; gap: 8px; }
+      .share-input { width: 100%; }
+      .calc { min-width: 120px; text-align: right; }
+      .muted { color: var(--mat-sys-on-surface-variant); }
+      .summary { display: flex; flex-direction: column; justify-content: center; align-items: start; }
+      .error { color: var(--mat-sys-error); font-weight: 500; }
+      .actions {
+        padding: 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      @media (max-width: 540px) {
+        .row-2 { grid-template-columns: 1fr; }
+        .share-row { grid-template-columns: 1fr; }
+      }
+    `]
 })
 export class NewHouseExpenseDialogComponent {
-    private dialogRef = inject(MatDialogRef<NewHouseExpenseDialogComponent>);
-    private expenseService = inject(ExpenseService);
+  private dialogRef = inject(MatDialogRef<NewHouseExpenseDialogComponent>);
+  private expenseService = inject(ExpenseService);
 
-    description = '';
-    amount: number | null = null;
+  description = '';
+  amount: number | null = null;
+  date: Date = new Date();
+  paidById: number | null = null;
+  customSplit = false;
+  shares: Array<{
+    roomieId: number;
+    firstName: string;
+    lastName: string;
+    picture?: string;
+    amount: number;
+  }> = [];
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
-    valid() { return !!this.amount && this.amount > 0; }
+  ngOnInit() {
+    // Default payer: first member
+    this.paidById = this.data.house.members[0]?.id ?? null;
+    // Initialize shares using payRatio as default percentages
+    const members = this.data.house.members ?? [];
+    const totalPercent = members.reduce((acc, m) => acc + (m.payRatioPercentage ?? m.payRatio * 100), 0);
+    this.shares = members.map(m => ({
+      roomieId: m.id,
+      firstName: m.firstName,
+      lastName: m.lastName,
+      picture: m.picture,
+      amount: 0,
+      percent: totalPercent > 0 ? (m.payRatioPercentage ?? m.payRatio * 100) : (members.length ? 100 / members.length : 0),
+    }));
+  }
 
-    save() {
-        const h = this.data.house;
-        const paidById = h.members[0]?.id; // simple default payer
-        this.expenseService.createExpense({
-            description: this.description,
-            amount: this.amount || 0,
-            date: new Date(),
-            houseId: h.id,
-            paidById,
-            expenseShares: h.members.map(m => ({ roomieId: m.id, shareAmount: Math.round((this.amount || 0) / Math.max(1, h.members.length)) }))
-        }).subscribe(() => this.close(true));
+  valid() {
+    if (!this.amount || this.amount <= 0) return false;
+    if (!this.date) return false;
+    if (!this.paidById) return false;
+    if (!this.customSplit) return true;
+    return this.sharesValid();
+  }
+
+  sharesValid(): boolean {
+    if (!this.customSplit) return true;
+    const totalAmount = this.shares.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+    return Math.abs(totalAmount - (this.amount || 0)) < 0.5;
+  }
+
+  summaryText(): string[] {
+    if (!this.amount) return ['', ''];
+    if (!this.customSplit) return [`Asignado: ${this.amount.toFixed(2)}`, `Por defecto con porcentajes`];
+    const totalAmount = this.shares.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+    const diff = (this.amount || 0) - totalAmount;
+    return [`Asignado: ${totalAmount.toFixed(2)}`, `Restante: ${diff.toFixed(2)}`];
+  }
+
+  calcAmountFromPercent(percent: number): number {
+    const amt = this.amount || 0;
+    return Math.round((amt * (Number(percent) || 0)) / 100);
+  }
+
+  onShareChange(_index: number) {
+    // No-op hook for potential live validations/calculations
+  }
+
+  save() {
+    const h = this.data.house;
+    const payload: any = {
+      description: this.description,
+      amount: this.amount || 0,
+      date: this.date,
+      houseId: h.id,
+      paidById: this.paidById!,
+    };
+
+    if (this.customSplit) {
+      const expenseShares = this.buildShares();
+      payload.expenseShares = expenseShares;
     }
 
-    close(ok: boolean) { this.dialogRef.close(ok); }
+
+    console.log("Saving expense with payload:", payload);
+    this.expenseService.createExpense(payload).subscribe((response) => {
+      console.log("Expense created successfully:", response);
+      this.close(true);
+    });
+  }
+
+  close(ok: boolean) { this.dialogRef.close(ok); }
+
+  private buildShares() {
+    const amt = this.amount || 0;
+    let remaining = Math.round(amt);
+    const result = this.shares.map((s, idx) => {
+      const val = Number(s.amount) || 0;
+      const shareAmount = idx === this.shares.length - 1 ? remaining : Math.round(val);
+      remaining -= shareAmount;
+      return { roomieId: s.roomieId, shareAmount };
+    });
+    return result;
+  }
+
+  initials(first?: string, last?: string): string {
+    const f = (first || '').trim();
+    const l = (last || '').trim();
+    return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  }
 }

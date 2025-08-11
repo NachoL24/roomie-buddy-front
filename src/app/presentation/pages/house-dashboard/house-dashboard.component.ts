@@ -195,10 +195,10 @@ export class HouseDashboardComponent implements OnInit {
   }
 
   openNewExpense() {
-    if (!this.house) return;
-    const ref = this.dialog.open(NewHouseExpenseDialogComponent, { data: { house: this.house } });
+    if (!this.house()) return;
+    const ref = this.dialog.open(NewHouseExpenseDialogComponent, { data: { house: this.house()! } });
     ref.afterClosed().subscribe(ok => {
-      if (ok && this.house) {
+      if (ok && this.house()) {
         this.snackBar.open('Expense created', 'Close', { duration: 2500 });
         this.refresh(this.house()!.id);
       }
@@ -206,10 +206,10 @@ export class HouseDashboardComponent implements OnInit {
   }
 
   openInvite() {
-    if (!this.house) return;
+    if (!this.house()) return;
     const ref = this.dialog.open(InviteMemberDialogComponent, { data: { houseId: this.house()!.id, roomies: this.house()!.members } });
     ref.afterClosed().subscribe(ok => {
-      if (ok && this.house) {
+      if (ok && this.house()) {
         this.snackBar.open('Invitación enviada', 'Cerrar');
         this.refresh(this.house()!.id);
       }
@@ -217,12 +217,12 @@ export class HouseDashboardComponent implements OnInit {
   }
 
   openSettings() {
-    if (!this.house) return;
+    if (!this.house()) return;
     const ref = this.dialog.open(PayRatioDialogComponent, {
       data: { houseId: this.house()!.id, members: this.house()!.members }
     });
     ref.afterClosed().subscribe(ok => {
-      if (ok && this.house) {
+      if (ok && this.house()) {
         this.snackBar.open('Ratios actualizados', 'Cerrar', { duration: 2500 });
         this.refresh(this.house()!.id);
       }
