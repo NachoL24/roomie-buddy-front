@@ -14,27 +14,33 @@ import { House, HouseBalanceSummary } from "@domain/entities";
       <h2>Balances de liquidación</h2>
       @if (data()) {
       <div>
-        <div class="details" *ngIf="entries().length; else noDetails">
-          <div class="detail" *ngFor="let e of entries()">
-            <ng-container *ngIf="e.member?.picture; else noPic">
-              <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" />
-            </ng-container>
-            <ng-template #noPic>
-              <div class="avatar">{{ initials(e.member?.firstName, e.member?.lastName) }}</div>
-            </ng-template>
-            <div class="person-details">
-              <div class="name">{{ e.member?.firstName }} {{ e.member?.lastName }}</div>
-              <div class="status">
-                <span *ngIf="e.amount > 0" class="positive">Te debe {{ e.amount | number:'1.2-2' }}</span>
-                <span *ngIf="e.amount < 0" class="negative">Debes {{ (-e.amount) | number:'1.2-2' }}</span>
-                <span *ngIf="e.amount === 0">Están al día</span>
+        @if (entries().length) {
+          <mat-card appearance="outlined" class="details">
+            @for (e of entries(); track e.id) {
+              <div class="detail">
+                @if (e.member?.picture) {
+                  <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" />
+                } @else {
+                  <div class="avatar">{{ initials(e.member?.firstName, e.member?.lastName) }}</div>
+                }
+                <div class="person-details">
+                  <div class="name">{{ e.member?.firstName }} {{ e.member?.lastName }}</div>
+                  <div class="status">
+                    @if (e.amount > 0) {
+                      <span class="positive">Te debe {{ e.amount | number:'1.2-2' }}</span>
+                    } @else if (e.amount < 0) {
+                      <span class="negative">Debes {{ (-e.amount) | number:'1.2-2' }}</span>
+                    } @else {
+                      <span>Están al día</span>
+                    }
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-        <ng-template #noDetails>
+            }
+          </mat-card>
+        } @else {
           <div class="empty">No hay balances detallados.</div>
-        </ng-template>
+        }
       </div>
       } @else {
         <div class="empty">Cargando balances…</div>
