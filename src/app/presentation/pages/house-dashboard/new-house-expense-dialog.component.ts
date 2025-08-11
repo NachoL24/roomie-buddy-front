@@ -32,22 +32,22 @@ interface DialogData { house: House; }
     MatDialogModule
   ],
   template: `
-    <h2 mat-dialog-title>Nuevo gasto de casa</h2>
+    <h2 mat-dialog-title class="title">Nuevo gasto de casa</h2>
     <div mat-dialog-content class="form">
       <mat-form-field appearance="outline" class="first">
         <mat-label>Descripción</mat-label>
-        <input matInput [(ngModel)]="description" />
+        <input matInput [(ngModel)]="description" required/>
       </mat-form-field>
 
       <div class="row-2">
         <mat-form-field appearance="outline">
           <mat-label>Monto</mat-label>
-          <input matInput type="number" min="0" step="0.01" [(ngModel)]="amount" />
+          <input matInput type="number" min="0" step="0.01" [(ngModel)]="amount" required/>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="date" />
+          <input matInput [matDatepicker]="picker" [(ngModel)]="date" required/>
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
@@ -55,16 +55,19 @@ interface DialogData { house: House; }
 
       <mat-form-field appearance="outline">
         <mat-label>Pagado por</mat-label>
-        <mat-select [(ngModel)]="paidById">
-          <mat-option *ngFor="let m of data.house.members" [value]="m.id">
-            <div class="option">
-              <img *ngIf="m.picture; else initialsTpl" class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
-              <ng-template #initialsTpl>
-                <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
-              </ng-template>
-              <span>{{ m.firstName }} {{ m.lastName }}</span>
-            </div>
-          </mat-option>
+        <mat-select [(ngModel)]="paidById" required>
+          @for (m of data.house.members; track m.id) {
+            <mat-option [value]="m.id">
+              <div class="option">
+                @if (m.picture) {
+                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
+                } @else {
+                  <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
+                }
+                <span>{{ m.firstName }} {{ m.lastName }}</span>
+              </div>
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
 
@@ -73,30 +76,35 @@ interface DialogData { house: House; }
         <mat-slide-toggle [(ngModel)]="customSplit" labelPosition="before">Dividir manualmente</mat-slide-toggle>
       </div>
 
-      <div *ngIf="customSplit" class="custom-split">
-        <div class="shares">
-          <div class="share-row" *ngFor="let s of shares; let i = index">
-            <div class="user">
-              <img *ngIf="s.picture; else initialsTpl2" class="avatar" [src]="s.picture!" [alt]="s.firstName + ' ' + s.lastName" />
-              <ng-template #initialsTpl2>
-                <div class="avatar initials">{{ initials(s.firstName, s.lastName) }}</div>
-              </ng-template>
-              <div class="name">{{ s.firstName }} {{ s.lastName }}</div>
-            </div>
-
-            <mat-form-field appearance="outline" class="share-input">
-              <mat-label>Monto</mat-label>
-              <input matInput type="number"
-                     [min]="0"
-                     [(ngModel)]="shares[i]['amount']"
-                     (ngModelChange)="onShareChange(i)"/>
-            </mat-form-field>
+      @if (customSplit) {
+        <div class="custom-split">
+          <div class="shares">
+            @for (s of shares; track s.roomieId) {
+              <div class="share-row">
+                <div class="user">
+                  @if (s.picture) {
+                    <img class="avatar" [src]="s.picture!" [alt]="s.firstName + ' ' + s.lastName" />
+                  } @else {
+                    <div class="avatar initials">{{ initials(s.firstName, s.lastName) }}</div>
+                  }
+                  <div class="name">{{ s.firstName }} {{ s.lastName }}</div>
+                </div>
+                <mat-form-field appearance="outline" class="share-input">
+                  <mat-label>Monto</mat-label>
+                  <input matInput type="number"
+                         [min]="0"
+                         [(ngModel)]="shares[$index]['amount']"
+                         (ngModelChange)="onShareChange($index)"/>
+                </mat-form-field>
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
     </div>
     <div mat-dialog-actions class="actions">
-      <div class="summary" *ngIf="amount">
+      @if (amount) {
+        <div class="summary">
           <div [class.error]="!sharesValid()">
             {{ summaryText()[0] }}
           </div>
@@ -104,13 +112,14 @@ interface DialogData { house: House; }
             {{ summaryText()[1] }}
           </div>
         </div>
+      }
       <span class="spacer"></span>
       <button mat-button (click)="close(false)">Cancelar</button>
       <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">Crear</button>
     </div>
   `,
   styles: [`
-      .form { display: flex; flex-direction: column; gap: 12px; width: 520px; max-width: 92vw; padding: 0 16px 4px 16px; }
+      .form { display: flex; flex-direction: column; width: 520px; max-width: 92vw; padding: 0 16px 4px 16px; }
       .first {
         margin-top: 8px;
       }
@@ -141,6 +150,9 @@ interface DialogData { house: House; }
         display: flex;
         justify-content: flex-end;
         gap: 8px;
+      }
+      .title {
+        padding-bottom: 4px !important;
       }
       @media (max-width: 540px) {
         .row-2 { grid-template-columns: 1fr; }
