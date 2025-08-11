@@ -79,9 +79,13 @@ interface DialogData { house: House; }
         <div class="row-2">
           <mat-form-field appearance="outline">
             <mat-label>Fecha</mat-label>
-            <input matInput [matDatepicker]="picker" [(ngModel)]="date" required/>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="date" required />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Horario</mat-label>
+            <input matInput type="time" [(ngModel)]="time" required />
           </mat-form-field>
         </div>
 
@@ -217,6 +221,7 @@ export class NewHouseExpenseDialogComponent {
   description = '';
   amount: number | null = null;
   date: Date = new Date();
+  time: string = '';
   paidById: number | null = null;
   paidToId: number | null = null;
   customSplit = false;
@@ -245,11 +250,17 @@ export class NewHouseExpenseDialogComponent {
       amount: 0,
       percent: totalPercent > 0 ? (m.payRatioPercentage ?? m.payRatio * 100) : (members.length ? 100 / members.length : 0),
     }));
+
+    // Initialize time from current date
+    const now = this.date;
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    this.time = `${hh}:${mm}`;
   }
 
   valid() {
     if (!this.amount || this.amount <= 0) return false;
-    if (!this.date) return false;
+    if (!this.date || !this.time) return false;
     if (!this.paidById) return false;
     if (!this.customSplit) return true;
     return this.sharesValid();
@@ -280,10 +291,18 @@ export class NewHouseExpenseDialogComponent {
 
   save() {
     const h = this.data.house;
+    // Combine date + time into a single Date instance
+    const dateTime = new Date(this.date);
+    if (this.time) {
+      const [th, tm] = this.time.split(':').map(v => parseInt(v, 10));
+      if (!Number.isNaN(th) && !Number.isNaN(tm)) {
+        dateTime.setHours(th, tm, this.date.getSeconds(), this.date.getMilliseconds());
+      }
+    }
     const payload: any = {
       description: this.description,
       amount: this.amount || 0,
-      date: this.date,
+      date: dateTime,
       houseId: h.id,
       paidById: this.paidById!,
     };
