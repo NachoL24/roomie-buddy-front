@@ -1,4 +1,4 @@
-import { Component, Inject, inject, computed } from '@angular/core';
+import { Component, Inject, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
@@ -40,32 +40,25 @@ interface DialogData { house: House; }
     <div mat-dialog-content class="form">
 
       <div class="toggle-strip">
-        <mat-button-toggle-group class="mode" value="red">
-          <mat-button-toggle value="red">Gasto</mat-button-toggle>
-          <mat-button-toggle value="green">Transferencia</mat-button-toggle>
+        <mat-button-toggle-group class="mode" [(ngModel)]="type">
+          <mat-button-toggle value="expense">Gasto</mat-button-toggle>
+          <mat-button-toggle value="settlement">Transferencia</mat-button-toggle>
         </mat-button-toggle-group>
       </div>
+
       <mat-form-field appearance="outline">
         <mat-label>Descripción</mat-label>
         <input matInput [(ngModel)]="description" required/>
       </mat-form-field>
 
-      <div class="row-2">
-        <mat-form-field appearance="outline">
-          <mat-label>Monto</mat-label>
-          <input matInput type="number" min="0" step="0.01" [(ngModel)]="amount" required/>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="date" required/>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
-      </div>
 
       <mat-form-field appearance="outline">
-        <mat-label>Pagado por</mat-label>
+        <mat-label>Monto</mat-label>
+        <input matInput type="number" min="0" step="0.01" [(ngModel)]="amount" required/>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{type() === 'expense' ? 'Pagado por' : 'Transferido por'}}</mat-label>
         <mat-select [(ngModel)]="paidById" required>
           @for (m of data.house.members; track m.id) {
             <mat-option [value]="m.id">
@@ -81,6 +74,17 @@ interface DialogData { house: House; }
           }
         </mat-select>
       </mat-form-field>
+      @if(type() === 'expense') {
+
+        <div class="row-2">
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="date" required/>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
 
       <div class="custom-toggle">
         <span class="spacer"></span>
@@ -115,6 +119,25 @@ interface DialogData { house: House; }
           </div>
         </div>
       }
+    } @else if (type() === 'settlement') {
+      <mat-form-field appearance="outline">
+        <mat-label>Transferido a</mat-label>
+        <mat-select [(ngModel)]="paidToId" required>
+          @for (m of data.house.members; track m.id) {
+            <mat-option [value]="m.id">
+              <div class="option">
+                @if (m.picture) {
+                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
+                } @else {
+                  <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
+                }
+                <span>{{ m.firstName }} {{ m.lastName }}</span>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
     </div>
     <div mat-dialog-actions class="actions">
       @if (amount) {
@@ -195,7 +218,9 @@ export class NewHouseExpenseDialogComponent {
   amount: number | null = null;
   date: Date = new Date();
   paidById: number | null = null;
+  paidToId: number | null = null;
   customSplit = false;
+  type = signal<'expense' | 'settlement'>('expense');
   shares: Array<{
     roomieId: number;
     firstName: string;
