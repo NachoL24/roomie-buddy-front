@@ -11,7 +11,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
-import { ExpenseService } from '@application/use-cases';
+import { ExpenseService, SettlementService } from '@application/use-cases';
 import { House } from '@domain/entities';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
@@ -74,20 +74,41 @@ interface DialogData { house: House; }
           }
         </mat-select>
       </mat-form-field>
+
+      @if (type() === 'settlement') {
+      <mat-form-field appearance="outline">
+        <mat-label>Transferido a</mat-label>
+        <mat-select [(ngModel)]="paidToId" required>
+          @for (m of data.house.members; track m.id) {
+            <mat-option [value]="m.id">
+              <div class="option">
+                @if (m.picture) {
+                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
+                } @else {
+                  <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
+                }
+                <span>{{ m.firstName }} {{ m.lastName }}</span>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+      <div class="row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="date" required />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Horario</mat-label>
+          <input matInput type="time" [(ngModel)]="time" required />
+        </mat-form-field>
+      </div>
       @if(type() === 'expense') {
 
-        <div class="row-2">
-          <mat-form-field appearance="outline">
-            <mat-label>Fecha</mat-label>
-            <input matInput [matDatepicker]="picker" [(ngModel)]="date" required />
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Horario</mat-label>
-            <input matInput type="time" [(ngModel)]="time" required />
-          </mat-form-field>
-        </div>
 
 
       <div class="custom-toggle">
@@ -123,24 +144,6 @@ interface DialogData { house: House; }
           </div>
         </div>
       }
-    } @else if (type() === 'settlement') {
-      <mat-form-field appearance="outline">
-        <mat-label>Transferido a</mat-label>
-        <mat-select [(ngModel)]="paidToId" required>
-          @for (m of data.house.members; track m.id) {
-            <mat-option [value]="m.id">
-              <div class="option">
-                @if (m.picture) {
-                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
-                } @else {
-                  <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
-                }
-                <span>{{ m.firstName }} {{ m.lastName }}</span>
-              </div>
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
     }
     </div>
     <div mat-dialog-actions class="actions">
@@ -217,6 +220,7 @@ interface DialogData { house: House; }
 export class NewHouseExpenseDialogComponent {
   private dialogRef = inject(MatDialogRef<NewHouseExpenseDialogComponent>);
   private expenseService = inject(ExpenseService);
+  private settlementService = inject(SettlementService);
 
   description = '';
   amount: number | null = null;
@@ -260,8 +264,16 @@ export class NewHouseExpenseDialogComponent {
 
   valid() {
     if (!this.amount || this.amount <= 0) return false;
-    if (!this.date || !this.time) return false;
     if (!this.paidById) return false;
+    // Settlement-specific validation (no date/time required)
+    if (this.type() === 'settlement') {
+      if (!this.paidToId || !!!this.amount || this.amount <= 0 || !this.paidById) return false;
+      if (!this.date || !this.time) return false;
+      if (this.paidToId === this.paidById) return false;
+      return true;
+    }
+    // Expense-specific validation
+    if (!this.date || !this.time) return false;
     if (!this.customSplit) return true;
     return this.sharesValid();
   }
@@ -291,6 +303,7 @@ export class NewHouseExpenseDialogComponent {
 
   save() {
     const h = this.data.house;
+    // If creating a settlement (transfer), call settlements endpoint
     // Combine date + time into a single Date instance
     const dateTime = new Date(this.date);
     if (this.time) {
@@ -298,6 +311,23 @@ export class NewHouseExpenseDialogComponent {
       if (!Number.isNaN(th) && !Number.isNaN(tm)) {
         dateTime.setHours(th, tm, this.date.getSeconds(), this.date.getMilliseconds());
       }
+    }
+    if (this.type() === 'settlement') {
+      const payload = {
+        fromRoomieId: this.paidById!,
+        toRoomieId: this.paidToId!,
+        amount: this.amount || 0,
+        houseId: h.id,
+        description: this.description || '',
+        date: dateTime
+      };
+
+      console.log('Saving settlement with payload:', payload);
+      this.settlementService.createSettlement(payload).subscribe((response) => {
+        console.log('Settlement created successfully:', response);
+        this.close(true);
+      });
+      return;
     }
     const payload: any = {
       description: this.description,

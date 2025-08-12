@@ -33,14 +33,16 @@ export class SettlementService {
         toRoomieId: number,
         amount: number,
         houseId: number,
-        description: string = 'Payment settlement'
+        description: string = 'Payment settlement',
+        date: Date
     ): Observable<Settlement> {
         const settlementData: CreateSettlementData = {
             fromRoomieId,
             toRoomieId,
             amount,
             houseId,
-            description
+            description,
+            date: date || new Date()  // Use provided date or current date if not specified
         };
         return this.createSettlement(settlementData);
     }
@@ -53,9 +55,10 @@ export class SettlementService {
         toRoomieId: number,
         amount: number,
         houseId: number,
-        expenseDescription: string
+      expenseDescription: string,
+      date: Date
     ): Observable<Settlement> {
         const description = `Settlement for: ${expenseDescription}`;
-        return this.makePayment(fromRoomieId, toRoomieId, amount, houseId, description);
+        return this.makePayment(fromRoomieId, toRoomieId, amount, houseId, description, date);
     }
 }

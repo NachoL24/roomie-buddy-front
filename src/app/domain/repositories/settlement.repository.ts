@@ -7,6 +7,7 @@ export interface CreateSettlementData {
     amount: number;
     houseId: number;
     description: string;
+    date: Date;
 }
 
 export abstract class SettlementRepository {
