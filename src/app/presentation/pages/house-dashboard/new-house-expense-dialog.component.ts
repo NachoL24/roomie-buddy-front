@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ExpenseService, SettlementService } from '@application/use-cases';
 import { FinancialActivityType, House } from '@domain/entities';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 interface DialogData {
   house: House;
@@ -40,15 +41,22 @@ interface DialogData {
     MatRadioModule,
     MatDialogModule,
     MatIconModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    MatProgressSpinnerModule
   ],
   template: `
     <h2 mat-dialog-title class="title">Nuevo gasto de casa</h2>
     <div mat-dialog-content class="form">
+      @if (loading()) {
+        <div class="loading">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      }
+      @if (!loading()) {
 
-      @if (!isEdit) {
+      @if (!isEdit()) {
         <div class="toggle-strip">
-          <mat-button-toggle-group class="mode" [(ngModel)]="type">
+          <mat-button-toggle-group class="mode" [ngModel]="type()" (ngModelChange)="type.set($event)">
             <mat-button-toggle value="expense">Gasto</mat-button-toggle>
             <mat-button-toggle value="settlement">Transferencia</mat-button-toggle>
           </mat-button-toggle-group>
@@ -57,18 +65,18 @@ interface DialogData {
 
       <mat-form-field appearance="outline" class="first">
         <mat-label>Descripción</mat-label>
-        <input matInput [(ngModel)]="description" required/>
+        <input matInput [ngModel]="description()" (ngModelChange)="description.set($event)" required/>
       </mat-form-field>
 
 
       <mat-form-field appearance="outline">
         <mat-label>Monto</mat-label>
-        <input matInput type="number" min="0" step="0.01" [(ngModel)]="amount" required/>
+        <input matInput type="number" min="0" step="0.01" [ngModel]="amount()" (ngModelChange)="setAmount($event)" required/>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>{{type() === 'expense' ? 'Pagado por' : 'Transferido por'}}</mat-label>
-        <mat-select [(ngModel)]="paidById" required>
+        <mat-select [ngModel]="paidById()" (ngModelChange)="setPaidById($event)" required>
           @for (m of data.house.members; track m.id) {
             <mat-option [value]="m.id">
               <div class="option">
@@ -87,7 +95,7 @@ interface DialogData {
       @if (type() === 'settlement') {
       <mat-form-field appearance="outline">
         <mat-label>Transferido a</mat-label>
-        <mat-select [(ngModel)]="paidToId" required>
+        <mat-select [ngModel]="paidToId()" (ngModelChange)="setPaidToId($event)" required>
           @for (m of data.house.members; track m.id) {
             <mat-option [value]="m.id">
               <div class="option">
@@ -107,32 +115,32 @@ interface DialogData {
       <div class="row-2">
         <mat-form-field appearance="outline">
           <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="date" required />
+          <input matInput [matDatepicker]="picker" [ngModel]="date()" (ngModelChange)="date.set($event)" required />
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Horario</mat-label>
-          <input matInput type="time" [(ngModel)]="time" required />
+          <input matInput type="time" [ngModel]="time()" (ngModelChange)="time.set($event)" required />
         </mat-form-field>
       </div>
       @if(type() === 'expense') {
 
 
-      @if (!isEdit) {
+      @if (!isEdit()) {
       <div class="custom-toggle">
         <span class="spacer"></span>
-        <button matButton="text" type="button" class="toggle-btn" (click)="customSplit = !customSplit">
-          <span class="toggle-text">{{ customSplit ? 'División automática' : 'Dividir manualmente' }}</span>
-          <mat-icon class="toggle-icon">{{ customSplit ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+        <button matButton="text" type="button" class="toggle-btn" (click)="customSplit.set(!customSplit())">
+          <span class="toggle-text">{{ customSplit() ? 'División automática' : 'Dividir manualmente' }}</span>
+          <mat-icon class="toggle-icon">{{ customSplit() ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
         </button>
       </div>
       }
 
-      @if (customSplit || isEdit) {
+      @if (customSplit() || isEdit()) {
         <div class="custom-split">
           <div class="shares">
-            @for (s of shares; track s.roomieId) {
+            @for (s of shares(); track s.roomieId; let i = $index) {
               <div class="share-row">
                 <div class="user">
                   @if (s.picture) {
@@ -146,8 +154,8 @@ interface DialogData {
                   <mat-label>Monto</mat-label>
                   <input matInput type="number"
                          [min]="0"
-                         [(ngModel)]="shares[$index]['amount']"
-                         (ngModelChange)="onShareChange($index)"/>
+                         [ngModel]="shares()[i].amount"
+                         (ngModelChange)="onShareChange(i, $event)"/>
                 </mat-form-field>
               </div>
             }
@@ -155,9 +163,10 @@ interface DialogData {
         </div>
       }
     }
+    }
     </div>
     <div mat-dialog-actions class="actions">
-      @if (amount) {
+      @if (amount() && type() === 'expense') {
         <div class="summary">
           <div [class.error]="!sharesValid()">
             {{ summaryText()[0] }}
@@ -169,7 +178,7 @@ interface DialogData {
       }
       <span class="spacer"></span>
       <button mat-button (click)="close(false)">Cancelar</button>
-      <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">{{isEdit ? 'Actualizar' : 'Crear'}}</button>
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">{{isEdit() ? 'Actualizar' : 'Crear'}}</button>
     </div>
   `,
   styles: [`
@@ -181,6 +190,7 @@ interface DialogData {
       .first {
         margin-top: 8px;
       }
+      .loading { display: flex; align-items: center; justify-content: center; padding: 24px 0; }
       .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .custom-toggle {
         display: flex;
@@ -232,73 +242,81 @@ export class NewHouseExpenseDialogComponent {
   private expenseService = inject(ExpenseService);
   private settlementService = inject(SettlementService);
 
-  description = '';
-  amount: number | null = null;
-  date: Date = new Date();
-  time: string = '';
-  paidById: number | null = null;
-  paidToId: number | null = null;
-  customSplit = false;
+  loading = signal<boolean>(false);
+  description = signal<string>('');
+  amount = signal<number | null>(null);
+  date = signal<Date>(new Date());
+  time = signal<string>('');
+  paidById = signal<number | null>(null);
+  paidToId = signal<number | null>(null);
+  customSplit = signal<boolean>(false);
   type = signal<'expense' | 'settlement'>('expense');
-  isEdit = false;
+  isEdit = signal<boolean>(false);
   editId: number | null = null;
-  shares: Array<{
+  shares = signal<Array<{
     roomieId: number;
     firstName: string;
     lastName: string;
     picture?: string;
     amount: number;
-  }> = [];
+  }>>([]);
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   ngOnInit() {
     // If editing an expense via id, fetch details (with shares) first
     if (this.data.expenseId) {
-      this.isEdit = true;
+      this.isEdit.set(true);
       this.editId = this.data.expenseId;
       this.type.set('expense');
+      this.loading.set(true);
       this.expenseService.getExpenseById(this.data.expenseId).subscribe(exp => {
-        this.description = exp.description || '';
-        this.amount = exp.amount;
-        this.date = new Date(exp.date);
-        const hh = String(this.date.getHours()).padStart(2, '0');
-        const mm = String(this.date.getMinutes()).padStart(2, '0');
-        this.time = `${hh}:${mm}`;
-        this.paidById = exp.paidById;
+        this.description.set(exp.description || '');
+        this.amount.set(exp.amount);
+        const d = new Date(exp.date);
+        this.date.set(d);
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        this.time.set(`${hh}:${mm}`);
+        this.paidById.set(exp.paidById);
         // Prefill shares for editing
         if (exp.expenseShares?.length) {
-          this.customSplit = true;
+          this.customSplit.set(true);
           const sharesMap = new Map(exp.expenseShares.map(s => [s.roomieId, s.shareAmount]));
-          this.shares = (this.data.house.members ?? []).map(m => ({
+          const newShares = (this.data.house.members ?? []).map(m => ({
             roomieId: m.id,
             firstName: m.firstName,
             lastName: m.lastName,
             picture: m.picture,
             amount: sharesMap.get(m.id) ?? 0
           }));
+          this.shares.set(newShares);
         }
+        this.loading.set(false);
+      }, _err => {
+        this.loading.set(false);
       });
     } else if (this.data.activity) {
       // Settlement edit path (still passing full activity)
       const a = this.data.activity;
-      this.isEdit = true;
+      this.isEdit.set(true);
       this.editId = a.id;
-      this.description = a.type === FinancialActivityType.SETTLEMENT ? (a.description.split(':')[1]?.trim() || '') : a.description;
-      this.amount = a.amount;
-      this.date = new Date(a.date);
-      const hh = String(this.date.getHours()).padStart(2, '0');
-      const mm = String(this.date.getMinutes()).padStart(2, '0');
-      this.time = `${hh}:${mm}`;
-      this.paidById = a.paidById ?? null;
-      this.paidToId = a.paidToId ?? null;
+      this.description.set(a.type === FinancialActivityType.SETTLEMENT ? (a.description.split(':')[1]?.trim() || '') : a.description);
+      this.amount.set(a.amount);
+      const d = new Date(a.date);
+      this.date.set(d);
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      this.time.set(`${hh}:${mm}`);
+      this.paidById.set(a.paidById ?? null);
+      this.paidToId.set(a.paidToId ?? null);
       this.type.set('settlement');
     }
     // Initialize default shares only if not prefilled by fetch
-    if (!this.shares.length) {
+    if (!this.shares().length) {
       const members = this.data.house.members ?? [];
       const totalPercent = members.reduce((acc, m) => acc + (m.payRatioPercentage ?? m.payRatio * 100), 0);
-      this.shares = members.map(m => ({
+      const defaultShares = members.map(m => ({
         roomieId: m.id,
         firstName: m.firstName,
         lastName: m.lastName,
@@ -306,75 +324,82 @@ export class NewHouseExpenseDialogComponent {
         amount: 0,
         percent: totalPercent > 0 ? (m.payRatioPercentage ?? m.payRatio * 100) : (members.length ? 100 / members.length : 0),
       }));
+      this.shares.set(defaultShares as any);
     }
 
     // Initialize time from current date
-    if (!this.time) {
-      const now = this.date;
+    if (!this.time()) {
+      const now = this.date();
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
-      this.time = `${hh}:${mm}`;
+      this.time.set(`${hh}:${mm}`);
     }
   }
 
   valid() {
-    if (!this.amount || this.amount <= 0) return false;
-    if (!this.paidById) return false;
+    if (!this.amount() || this.amount()! <= 0) return false;
+    if (!this.paidById()) return false;
     // Settlement-specific validation (no date/time required for create; we still collect date/time)
     if (this.type() === 'settlement') {
-      if (!this.paidToId || !!!this.amount || this.amount <= 0 || !this.paidById) return false;
-      if (this.paidToId === this.paidById) return false;
+      if (!this.paidToId() || !!!this.amount() || this.amount()! <= 0 || !this.paidById()) return false;
+      if (this.paidToId() === this.paidById()) return false;
       return true;
     }
     // Expense-specific validation
-    if (!this.date || !this.time) return false;
-    if (!this.customSplit) return true;
+    if (!this.date() || !this.time()) return false;
+    if (!this.customSplit()) return true;
     return this.sharesValid();
   }
 
   sharesValid(): boolean {
-    if (!this.customSplit) return true;
-    const totalAmount = this.shares.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
-    return Math.abs(totalAmount - (this.amount || 0)) < 0.5;
+    if (!this.customSplit()) return true;
+    const totalAmount = this.shares().reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+    return Math.abs(totalAmount - (this.amount() || 0)) < 0.5;
   }
 
   summaryText(): string[] {
-    if (!this.amount) return ['', ''];
-    if (!this.customSplit) return [`Asignado: ${this.amount.toFixed(2)}`, `Por defecto con porcentajes`];
-    const totalAmount = this.shares.reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
-    const diff = (this.amount || 0) - totalAmount;
+    if (!this.amount()) return ['', ''];
+    if (!this.customSplit()) return [`Asignado: ${this.amount()!.toFixed(2)}`, `Por defecto con porcentajes`];
+    const totalAmount = this.shares().reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+    const diff = (this.amount() || 0) - totalAmount;
     return [`Asignado: ${totalAmount.toFixed(2)}`, `Restante: ${diff.toFixed(2)}`];
   }
 
   calcAmountFromPercent(percent: number): number {
-    const amt = this.amount || 0;
+    const amt = this.amount() || 0;
     return Math.round((amt * (Number(percent) || 0)) / 100);
   }
 
-  onShareChange(_index: number) {
-    // No-op hook for potential live validations/calculations
+  onShareChange(index: number, value: any) {
+    const num = Number(value) || 0;
+    this.shares.update(arr => arr.map((s, i) => i === index ? { ...s, amount: num } : s));
   }
+
+  setAmount(value: any) { this.amount.set(value === null || value === '' ? null : Number(value)); }
+  setPaidById(value: any) { this.paidById.set(value === null || value === '' ? null : Number(value)); }
+  setPaidToId(value: any) { this.paidToId.set(value === null || value === '' ? null : Number(value)); }
 
   save() {
     const h = this.data.house;
     // If creating a settlement (transfer), call settlements endpoint
     // Combine date + time into a single Date instance
-    const dateTime = new Date(this.date);
-    if (this.time) {
-      const [th, tm] = this.time.split(':').map(v => parseInt(v, 10));
+    const dateTime = new Date(this.date());
+    if (this.time()) {
+      const [th, tm] = this.time().split(':').map(v => parseInt(v, 10));
       if (!Number.isNaN(th) && !Number.isNaN(tm)) {
-        dateTime.setHours(th, tm, this.date.getSeconds(), this.date.getMilliseconds());
+        const base = this.date();
+        dateTime.setHours(th, tm, base.getSeconds(), base.getMilliseconds());
       }
     }
     if (this.type() === 'settlement') {
-      if (this.isEdit && this.editId) {
+      if (this.isEdit() && this.editId) {
         // Send only changed fields
         const updatePayload: any = {};
-        if (this.description) updatePayload.description = this.description;
-        if (this.amount) updatePayload.amount = this.amount;
-        if (this.paidById) updatePayload.fromRoomieId = this.paidById;
-        if (this.paidToId) updatePayload.toRoomieId = this.paidToId;
-        if (this.date && this.time) updatePayload.date = dateTime;
+        if (this.description()) updatePayload.description = this.description();
+        if (this.amount()) updatePayload.amount = this.amount();
+        if (this.paidById()) updatePayload.fromRoomieId = this.paidById();
+        if (this.paidToId()) updatePayload.toRoomieId = this.paidToId();
+        if (this.date() && this.time()) updatePayload.date = dateTime;
 
         console.log('Updating settlement with payload:', updatePayload);
         this.settlementService.updateSettlement(this.editId, updatePayload).subscribe((response) => {
@@ -383,11 +408,11 @@ export class NewHouseExpenseDialogComponent {
         });
       } else {
         const payload = {
-          fromRoomieId: this.paidById!,
-          toRoomieId: this.paidToId!,
-          amount: this.amount || 0,
+          fromRoomieId: this.paidById()!,
+          toRoomieId: this.paidToId()!,
+          amount: this.amount() || 0,
           houseId: h.id,
-          description: this.description || '',
+          description: this.description() || '',
           date: dateTime
         };
 
@@ -400,20 +425,20 @@ export class NewHouseExpenseDialogComponent {
       return;
     }
     const payload: any = {
-      description: this.description,
-      amount: this.amount || 0,
+      description: this.description(),
+      amount: this.amount() || 0,
       date: dateTime,
       houseId: h.id,
-      paidById: this.paidById!,
+      paidById: this.paidById()!,
     };
 
-    if (this.customSplit) {
+    if (this.customSplit()) {
       const expenseShares = this.buildShares();
       payload.expenseShares = expenseShares;
     }
 
 
-    if (this.isEdit && this.editId) {
+    if (this.isEdit() && this.editId) {
       console.log('Updating expense with payload:', payload);
       this.expenseService.updateExpense(this.editId, payload).subscribe((response) => {
         console.log('Expense updated successfully:', response);
@@ -431,11 +456,11 @@ export class NewHouseExpenseDialogComponent {
   close(ok: boolean) { this.dialogRef.close(ok); }
 
   private buildShares() {
-    const amt = this.amount || 0;
+    const amt = this.amount() || 0;
     let remaining = Math.round(amt);
-    const result = this.shares.map((s, idx) => {
+    const result = this.shares().map((s, idx) => {
       const val = Number(s.amount) || 0;
-      const shareAmount = idx === this.shares.length - 1 ? remaining : Math.round(val);
+      const shareAmount = idx === this.shares().length - 1 ? remaining : Math.round(val);
       remaining -= shareAmount;
       return { roomieId: s.roomieId, shareAmount };
     });

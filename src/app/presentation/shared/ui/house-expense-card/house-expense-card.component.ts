@@ -7,7 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { FinancialActivity, FinancialActivityType, House } from '@domain/entities';
-import { ExpenseService } from '@application/use-cases';
+import { ExpenseService, SettlementService } from '@application/use-cases';
 import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
 
 @Component({
@@ -147,6 +147,7 @@ export class HouseExpenseCardComponent {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private expenseService = inject(ExpenseService);
+  private settlementService = inject(SettlementService);
 
   payerInitials(): string {
     return this.initialsFrom(this.activity.paidByName);
@@ -162,11 +163,11 @@ export class HouseExpenseCardComponent {
   }
 
   onDelete() {
-    if (this.activity.type !== FinancialActivityType.EXPENSE) return;
+    const isExpense = this.activity.type === FinancialActivityType.EXPENSE;
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Eliminar gasto',
-        message: '¿Querés eliminar este gasto? Esta acción no se puede deshacer.',
+        title: isExpense ? 'Eliminar gasto' : 'Eliminar transferencia',
+        message: isExpense ? '¿Querés eliminar este gasto? Esta acción no se puede deshacer.' : '¿Querés eliminar esta transferencia? Esta acción no se puede deshacer.',
         confirmText: 'Eliminar',
         cancelText: 'Cancelar'
       }
@@ -174,14 +175,18 @@ export class HouseExpenseCardComponent {
 
     ref.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
-      this.expenseService.deleteExpense(this.activity.id).subscribe({
+      const request$ = isExpense
+        ? this.expenseService.deleteExpense(this.activity.id)
+        : this.settlementService.deleteSettlement(this.activity.id);
+
+      request$.subscribe({
         next: () => {
-          this.snackBar.open('Gasto eliminado', 'Cerrar', { duration: 2500 });
+          this.snackBar.open(isExpense ? 'Gasto eliminado' : 'Transferencia eliminada', 'Cerrar', { duration: 2500 });
           this.deleted.emit();
         },
         error: (error) => {
-          console.error('Error deleting house expense', error);
-          this.snackBar.open('Error al eliminar el gasto', 'Cerrar', { duration: 3000 });
+          console.error('Error deleting transaction', error);
+          this.snackBar.open('Error al eliminar la transacción', 'Cerrar', { duration: 3000 });
         }
       });
     });

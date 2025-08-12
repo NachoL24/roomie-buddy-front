@@ -24,4 +24,5 @@ export abstract class SettlementRepository {
   abstract getSettlementsByHouse(houseId: number): Observable<Settlement[]>;
   abstract getBalanceSummary(houseId: number): Observable<BalanceSummary>;
   abstract getMyHouseBalanceSummary(houseId: number): Observable<HouseBalanceSummary>;
+  abstract deleteSettlement(id: number): Observable<void>;
 }
