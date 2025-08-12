@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +17,7 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent, NgOptimizedImage],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -67,7 +67,7 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
           <ul class="member-list">
             <li *ngFor="let m of house()?.members" class="member-item">
                @if (m.picture) {
-                <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" />
+                <img class="avatar" [ngSrc]="m.picture!" width="40" height="40" [alt]="m.firstName + ' ' + m.lastName" />
                } @else {
               <div class="avatar">
                 {{ initials(m.firstName, m.lastName) }}

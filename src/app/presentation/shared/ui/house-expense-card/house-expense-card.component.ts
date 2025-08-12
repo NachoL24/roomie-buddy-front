@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgOptimizedImage } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -20,7 +20,8 @@ import { TransactionDetailsDialogComponent } from '@presentation/shared/ui/trans
     MatCardModule,
     MatIconModule,
     MatMenuModule,
-    MatDialogModule
+    MatDialogModule,
+    NgOptimizedImage
   ],
   template: `
   <mat-card class="transaction-card" (click)="openDetails()" [class.expense]="activity.type === activityType.EXPENSE" [class.settlement]="activity.type === activityType.SETTLEMENT" [matContextMenuTriggerFor]="contextMenu">
@@ -32,12 +33,12 @@ import { TransactionDetailsDialogComponent } from '@presentation/shared/ui/trans
                 {{ activity.type === activityType.EXPENSE ? 'trending_down' : 'swap_horiz' }}
               </mat-icon>
               @if (activity.paidByPicture) {
-                <img class="payer-avatar" [src]="activity.paidByPicture" alt="payer" />
+                <img class="payer-avatar" [ngSrc]="activity.paidByPicture!" width="24" height="24" alt="payer" />
               } @else if (activity.paidByName) {
                 <span class="payer-avatar initials">{{ payerInitials() }}</span>
               }
               @if (activity.type === activityType.SETTLEMENT && activity.paidToPicture) {
-                <img class="paid-avatar" [src]="activity.paidToPicture" alt="payer" />
+                <img class="paid-avatar" [ngSrc]="activity.paidToPicture!" width="24" height="24" alt="receiver" />
               }
             </div>
           </div>

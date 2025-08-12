@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CurrencyPipe, DatePipe, NgClass, NgOptimizedImage } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass } from '@angular/common';
 import { FinancialActivity, FinancialActivityType } from '@domain/entities';
 
 export interface TransactionDetailsData {
@@ -19,7 +19,6 @@ export interface TransactionDetailsData {
     CurrencyPipe,
     DatePipe,
     NgClass,
-    NgOptimizedImage
   ],
   template: `
     <div class="header">
