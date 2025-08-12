@@ -9,10 +9,11 @@ import { MatMenuModule } from "@angular/material/menu";
 import { ThemeSwitcherComponent } from "../theme-switcher/theme-switcher";
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
+import { NotificationsMenuComponent } from "../notifications/notifications-menu.component";
 
 @Component({
   selector: 'app-toolbar',
-  imports: [MatToolbarModule, MatButtonModule, MatIconModule, UserMenuComponent, MatMenuModule, ThemeSwitcherComponent, CommonModule],
+  imports: [MatToolbarModule, MatButtonModule, MatIconModule, UserMenuComponent, MatMenuModule, ThemeSwitcherComponent, CommonModule, NotificationsMenuComponent],
   template: `
     <mat-toolbar class="toolbar">
       @if (theme.resolvedTheme() === 'dark') {
@@ -24,6 +25,7 @@ import { CommonModule } from "@angular/common";
 
       <span class="spacer"></span>
       @if (globalUser.isLoggedIn()) {
+        <app-notifications-menu class="notifications"/>
         <app-user-menu/>
       } @else {
         <button mat-button class="nav-button" (click)="scrollToCharacteristics()">
@@ -51,6 +53,7 @@ import { CommonModule } from "@angular/common";
       z-index: 20;
       height: 64px;
     }
+
     .spacer {
       flex: 1 1 auto;
     }
@@ -71,6 +74,10 @@ import { CommonModule } from "@angular/common";
         font-optical-sizing: auto;
         font-weight: 700;
         color: var(--mat-sys-primary);
+    }
+
+    .notifications {
+      margin-right: 12px;
     }
 
     .nav-button {

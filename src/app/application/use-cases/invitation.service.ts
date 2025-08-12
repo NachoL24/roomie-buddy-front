@@ -14,15 +14,15 @@ export class InvitationService {
         return this.invitationRepository.createInvitation(data);
     }
 
-    acceptInvitation(invitationId: number): Observable<void> {
+    acceptInvitation(invitationId: string): Observable<void> {
         return this.invitationRepository.acceptInvitation(invitationId);
     }
 
-    declineInvitation(invitationId: number): Observable<void> {
+    declineInvitation(invitationId: string): Observable<void> {
         return this.invitationRepository.declineInvitation(invitationId);
     }
 
-    cancelInvitation(invitationId: number): Observable<void> {
+    cancelInvitation(invitationId: string): Observable<void> {
         return this.invitationRepository.cancelInvitation(invitationId);
     }
 

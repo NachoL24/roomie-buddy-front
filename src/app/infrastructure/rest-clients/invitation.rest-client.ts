@@ -25,15 +25,15 @@ export class InvitationRestClient extends InvitationRepository {
             .pipe(map(InvitationMapper.fromResponse));
     }
 
-    acceptInvitation(id: number): Observable<void> {
+    acceptInvitation(id: string): Observable<void> {
         return this.http.put<void>(`${this.apiBaseUrl}/invitations/${id}/accept`, {});
     }
 
-    declineInvitation(id: number): Observable<void> {
+    declineInvitation(id: string): Observable<void> {
         return this.http.put<void>(`${this.apiBaseUrl}/invitations/${id}/decline`, {});
     }
 
-    cancelInvitation(id: number): Observable<void> {
+    cancelInvitation(id: string): Observable<void> {
         return this.http.put<void>(`${this.apiBaseUrl}/invitations/${id}/cancel`, {});
     }
 
@@ -59,7 +59,7 @@ export class InvitationRestClient extends InvitationRepository {
 
     getNotifications(): Observable<Invitation[]> {
         return this.http.get<InvitationResponseDto[]>(`${this.apiBaseUrl}/invitations/notifications`)
-            .pipe(map(invitations => invitations.map(InvitationMapper.fromResponse)));
+            .pipe(map(invitations => invitations.map(i => InvitationMapper.fromResponse(i))));
     }
 
     getInvitationsByHouse(houseId: number): Observable<Invitation[]> {

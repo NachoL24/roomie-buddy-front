@@ -5,13 +5,18 @@ export interface InvitationCreateRequestDto {
 }
 
 export interface InvitationResponseDto {
-  id: number;
-  inviterRoomieId: number;
-  inviteeEmail: string;
+  id: string;
   houseId: number;
-  status: 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'CANCELLED';
-  createdAt: string;
-  respondedAt?: string;
+  houseName: string;
+  inviterId: number;
+  inviteeId: number;
+  inviterName: string;
+  inviterEmail: string;
+  status: 'PENDING' | 'ACCEPTED' | 'CANCELED' | 'DECLINED';
+  createdAt: Date;
+  acceptedAt?: Date;
+  declinedAt?: Date;
+  canceledAt?: Date;
 }
 
 export interface InvitationSummaryResponseDto {

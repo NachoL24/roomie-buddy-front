@@ -8,9 +8,9 @@ export interface CreateInvitationData {
 
 export abstract class InvitationRepository {
     abstract createInvitation(data: CreateInvitationData): Observable<Invitation>;
-    abstract acceptInvitation(id: number): Observable<void>;
-    abstract declineInvitation(id: number): Observable<void>;
-    abstract cancelInvitation(id: number): Observable<void>;
+    abstract acceptInvitation(id: string): Observable<void>;
+    abstract declineInvitation(id: string): Observable<void>;
+    abstract cancelInvitation(id: string): Observable<void>;
     abstract getMyInvitations(): Observable<Invitation[]>;
     abstract getSentInvitations(): Observable<Invitation[]>;
     abstract getReceivedInvitations(): Observable<Invitation[]>;
