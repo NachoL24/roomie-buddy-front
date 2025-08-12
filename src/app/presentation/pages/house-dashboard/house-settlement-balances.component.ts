@@ -4,14 +4,15 @@ import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from '@angular/material/icon';
 import { SettlementService } from "@application/use-cases";
 import { House, HouseBalanceSummary } from "@domain/entities";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-house-balance',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule],
   template: `
     <div class="balances">
-      <h2>Balances de liquidación</h2>
+      <h2>Balances</h2>
       @if (data()) {
       <div>
         @if (entries().length) {
@@ -39,11 +40,15 @@ import { House, HouseBalanceSummary } from "@domain/entities";
             }
           </mat-card>
         } @else {
-          <div class="empty">No hay balances detallados.</div>
+          <div class="loading">
+          <div class="empty">Estas al día</div>
+          </div>
         }
       </div>
       } @else {
-        <div class="empty">Cargando balances…</div>
+        <div class="loading">
+          <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+        </div>
       }
 
     </div>
@@ -63,6 +68,12 @@ import { House, HouseBalanceSummary } from "@domain/entities";
   .detail { display: flex; flex-direction: row; gap: 12px; align-items: center; padding: 10px; }
   .person { display: flex; align-items: center; justify-content: start; }
   .avatar { width: 28px; height: 28px; border-radius: 50%; background: #f0d7cd; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
   h3 { margin: 8px 0 4px; font-size: 14px; color: var(--mat-sys-on-surface-variant); }
     .empty { color: var(--mat-sys-on-surface-variant); padding: 8px; }
     .person-details { display: flex; flex-direction: column; gap: 0; }
@@ -114,27 +125,36 @@ export class HouseSettlementBalancesComponent implements OnInit, OnChanges {
   });
 
   ngOnInit(): void {
+    // Ensure initial value is captured and fetch
+    if (this.house) this.houseSig.set(this.house);
     const h = this.houseSig();
     if (!h) return;
-    this.loading.set(true);
-    this.data.set(null);
-    this.settlementService.getMyHouseBalanceSummary(h.id).subscribe(summary => {
-      console.log("Balance summary:", summary);
-      this.data.set(summary);
-      this.loading.set(false);
-    }, error => {
-      console.error("Error fetching balance summary:", error);
-      this.loading.set(false);
-    });
+    this.fetchSummary(h.id);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['house']) this.houseSig.set(this.house);
+    if (changes['house']) {
+      this.houseSig.set(this.house);
+      if (this.house) this.fetchSummary(this.house.id);
+    }
   }
 
   initials(first?: string, last?: string): string {
     const f = (first || '').trim();
     const l = (last || '').trim();
     return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  }
+
+  private fetchSummary(houseId: number) {
+    this.loading.set(true);
+    this.data.set(null);
+    this.settlementService.getMyHouseBalanceSummary(houseId).subscribe(summary => {
+      console.log('Balance summary:', summary);
+      this.data.set(summary);
+      this.loading.set(false);
+    }, error => {
+      console.error('Error fetching balance summary:', error);
+      this.loading.set(false);
+    });
   }
 }

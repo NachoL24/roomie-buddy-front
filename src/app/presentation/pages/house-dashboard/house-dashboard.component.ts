@@ -199,7 +199,7 @@ export class HouseDashboardComponent implements OnInit {
     const ref = this.dialog.open(NewHouseExpenseDialogComponent, { data: { house: this.house()! } });
     ref.afterClosed().subscribe(ok => {
       if (ok && this.house()) {
-        this.snackBar.open('Expense created', 'Close', { duration: 2500 });
+        this.snackBar.open('Transacción creada', 'Cerrar', { duration: 2500 });
         this.refresh(this.house()!.id);
       }
     });
