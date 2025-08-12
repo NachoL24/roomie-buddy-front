@@ -1,10 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, inject, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSliderModule } from '@angular/material/slider';
 import { HouseMember } from '@domain/entities';
-import { HouseService } from '@application/use-cases';
+import { GlobalUserService, HouseService } from '@application/use-cases';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfirmDialogComponent } from '@presentation/shared/ui';
 
 interface DialogData {
   houseId: number;
@@ -14,7 +18,7 @@ interface DialogData {
 @Component({
   selector: 'app-pay-ratio-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatSliderModule],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatSliderModule, NgOptimizedImage, MatIconModule, MatTooltipModule],
   template: `
     <h2 mat-dialog-title>Configurar ratios de pago</h2>
     <div mat-dialog-content class="content">
@@ -26,7 +30,11 @@ interface DialogData {
         @for (m of data.members; track m.id; let i = $index) {
           <div class="row">
             <div class="member">
-              <div class="avatar">{{ initials(m.firstName, m.lastName) }}</div>
+              @if (m.picture) {
+                <img class="avatar" [ngSrc]="m.picture!" width="40" height="40" [alt]="m.firstName + ' ' + m.lastName" />
+              } @else {
+                <div class="avatar">{{ initials(m.firstName, m.lastName) }}</div>
+              }
               <div class="info">
                 <div class="name">{{ m.firstName }} {{ m.lastName }}</div>
                 <div class="email">{{ m.email }}</div>
@@ -35,7 +43,7 @@ interface DialogData {
             <div class="slider">
               <mat-slider
                 [min]="0"
-                [max]="maxFor(i)"
+                [max]="100"
                 [step]="1"
                 discrete
                 showTickMarks
@@ -43,6 +51,11 @@ interface DialogData {
                 <input matSliderThumb [value]="values[i]" (valueChange)="onChange(i, $event)" />
               </mat-slider>
               <div class="percent">{{ values[i] }}%</div>
+            </div>
+            <div class="delete">
+              <button mat-icon-button (click)="removeMember(m.id)" matTooltip="Eliminar miembro">
+                <mat-icon class="delete-icon">person_remove</mat-icon>
+              </button>
             </div>
           </div>
         }
@@ -62,7 +75,7 @@ interface DialogData {
   `,
   styles: [`
     .content { width: 560px; max-width: 100%; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 16px; padding: 8px 0; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 0.2fr; align-items: center; gap: 16px; padding: 8px 0; }
     .header { font-weight: 600; border-bottom: 1px solid var(--mat-sys-outline-variant); margin-bottom: 8px; }
     .member { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 36px; height: 36px; border-radius: 50%; background: #f0d7cd; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #6a4a3c; }
@@ -74,16 +87,22 @@ interface DialogData {
     .total { margin-top: 8px; font-weight: 600; text-align: right; }
     .total.invalid { color: var(--mat-sys-error); }
     .empty { color: var(--mat-sys-on-surface-variant); }
+    .delete-icon {
+      color: var(--mat-sys-error);
+    }
   `]
 })
 export class PayRatioDialogComponent implements OnInit {
   values: number[] = [];
   saving = false;
+  globalUser = inject(GlobalUserService);
 
   constructor(
     private dialogRef: MatDialogRef<PayRatioDialogComponent>,
     private houseService: HouseService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private dialog: MatDialog,
+    private snack: MatSnackBar
   ) { }
 
   ngOnInit(): void {
@@ -121,7 +140,7 @@ export class PayRatioDialogComponent implements OnInit {
   onChange(index: number, newVal: number) {
     // Clamp to dynamic max to strictly enforce sum <= 100
     const max = this.maxFor(index);
-    this.values[index] = Math.min(Math.max(0, Math.round(newVal)), max);
+    this.values[index] = newVal
   }
 
   save() {
@@ -135,4 +154,50 @@ export class PayRatioDialogComponent implements OnInit {
   }
 
   close(ok: boolean) { this.dialogRef.close(ok); }
+
+  isMe(id: number): boolean {
+    return this.globalUser.user()?.id === id;
+  }
+
+  removeMember(id: number) {
+    const me = this.isMe(id);
+    if (me) {
+      const ref = this.dialog.open(ConfirmDialogComponent, {
+            data: {
+              title: 'Confirmar abandono',
+              message: '¿Estás seguro de que quieres abandonar la casa?',
+          }
+      });
+      ref.afterClosed().subscribe(result => {
+        if (result) {
+          this.houseService.leaveHouse(this.data.houseId).subscribe({
+            next: () => {
+              this.snack.open('Has abandonado la casa', 'Cerrar');
+              this.close(true);
+
+            },
+            error: () => { this.snack.open('Error al abandonar la casa', 'Cerrar'); },
+          });
+        }
+      });
+      return;
+    }
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Confirmar eliminación',
+        message: '¿Estás seguro de que quieres eliminar a este miembro?',
+      }
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result) {
+        this.houseService.removeMemberFromHouse(this.data.houseId, id).subscribe({
+          next: () => {
+            this.data.members = this.data.members.filter(m => m.id !== id);
+            this.values = this.values.filter((_, i) => i !== this.data.members.findIndex(m => m.id === id));
+          },
+          error: () => { this.snack.open('Error al eliminar miembro', 'Cerrar'); },
+        });
+      }
+    });
+  }
 }
