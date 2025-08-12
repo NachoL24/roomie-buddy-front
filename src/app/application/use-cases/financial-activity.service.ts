@@ -14,7 +14,7 @@ export class FinancialActivityService {
     return this.financialActivityRepository.getFinancialActivities(params);
   }
 
-  getHouseFinancialActivities(houseId: number, startDate?: string, endDate?: string): Observable<FinancialActivity[]> {
-    return this.financialActivityRepository.getHouseFinancialActivities(houseId, startDate, endDate);
+  getHouseFinancialActivities(houseId: number, startDate?: string, endDate?: string, page?: number, pageSize?: number): Observable<Page<FinancialActivity>> {
+    return this.financialActivityRepository.getHouseFinancialActivities(houseId, startDate, endDate, page, pageSize);
   }
 }

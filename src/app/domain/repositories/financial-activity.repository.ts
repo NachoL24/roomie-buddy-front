@@ -12,6 +12,8 @@ export abstract class FinancialActivityRepository {
   abstract getHouseFinancialActivities(
     houseId: number,
     startDate?: string,
-    endDate?: string
-  ): Observable<FinancialActivity[]>;
+    endDate?: string,
+    page?: number,
+    pageSize?: number
+  ): Observable<Page<FinancialActivity>>;
 }

@@ -1,6 +1,6 @@
 import { Settlement, BalanceSummary, RoomieBalance, HouseBalanceSummary, BalanceDto as DomainBalanceDto, DetailedBalanceDto as DomainDetailedBalanceDto } from '../../domain/entities';
-import { SettlementResponseDto, BalanceSummaryResponseDto, RoomieBalanceResponseDto, CreateSettlementRequestDto, HouseBalanceSummaryResponseDto, HouseBalanceDtoResponse, DetailedBalanceItemResponse } from '../dtos';
-import { CreateSettlementData } from '../../domain/repositories';
+import { SettlementResponseDto, BalanceSummaryResponseDto, RoomieBalanceResponseDto, CreateSettlementRequestDto, HouseBalanceSummaryResponseDto, HouseBalanceDtoResponse, DetailedBalanceItemResponse, UpdateSettlementRequestDto } from '../dtos';
+import { CreateSettlementData, UpdateSettlementData } from '../../domain/repositories';
 
 export class SettlementMapper {
     static fromResponse(response: SettlementResponseDto): Settlement {
@@ -41,6 +41,16 @@ export class SettlementMapper {
             amount: data.amount,
             houseId: data.houseId,
             description: data.description
+        };
+    }
+
+    static toUpdateRequest(data: UpdateSettlementData): UpdateSettlementRequestDto {
+        return {
+            amount: data.amount,
+            date: data.date ? data.date.toISOString() : undefined,
+            description: data.description,
+            toRoomieId: data.toRoomieId,
+            fromRoomieId: data.fromRoomieId
         };
     }
 

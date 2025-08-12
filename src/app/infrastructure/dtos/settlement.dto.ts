@@ -7,6 +7,14 @@ export interface CreateSettlementRequestDto {
     description: string;
 }
 
+export interface UpdateSettlementRequestDto {
+    amount?: number;
+    date?: string; // ISO 8601
+    description?: string;
+    toRoomieId?: number;
+    fromRoomieId?: number;
+}
+
 export interface SettlementResponseDto {
     id: number;
     fromRoomieId: number;

@@ -4,6 +4,7 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HouseService, FinancialActivityService } from '@application/use-cases';
 import { FinancialActivity, FinancialActivityType, House } from '@domain/entities';
@@ -16,7 +17,7 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -35,12 +36,20 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
           @if (activities().length) {
             <div class="card-list">
               @for (act of activities(); track act.id) {
-                <app-house-expense-card [activity]="act" (deleted)="refresh(house()!.id)" />
+                <app-house-expense-card [activity]="act" [house]="house()!" (deleted)="refresh(house()!.id)" (updated)="refresh(house()!.id)" />
               }
             </div>
           } @else {
             <div class="empty">No transactions yet</div>
           }
+
+          <mat-paginator
+            [length]="totalCount()"
+            [pageIndex]="pageIndex()"
+            [pageSize]="pageSize()"
+            [pageSizeOptions]="pageSizeOptions"
+            (page)="onPage($event)"
+          />
         </section>
 
         <aside class="members">
@@ -156,6 +165,10 @@ export class HouseDashboardComponent implements OnInit {
   house = signal<House | null>(null);
   activities = signal<FinancialActivity[]>([]);
   protected activityType = FinancialActivityType;
+  totalCount = signal<number>(0);
+  pageIndex = signal<number>(0); // 0-based for MatPaginator
+  pageSize = signal<number>(10);
+  readonly pageSizeOptions = [5, 10, 20, 50];
 
   ngOnInit(): void {
     // Initial load
@@ -171,12 +184,25 @@ export class HouseDashboardComponent implements OnInit {
     });
   }
 
-  refresh(houseId: number) {
+  refresh(houseId: number, pageIdx?: number, size?: number) {
+    const effectivePageIndex = pageIdx ?? this.pageIndex();
+    const effectivePageSize = size ?? this.pageSize();
     this.houseService.getHouseById(houseId).subscribe(h => { this.house.set(h); console.log("en componente:", h); });
-    this.activityService.getHouseFinancialActivities(houseId).subscribe(list => {
-      const sorted = [...list].sort((a, b) => b.date.getTime() - a.date.getTime());
+    this.activityService.getHouseFinancialActivities(houseId, undefined, undefined, effectivePageIndex + 1, effectivePageSize).subscribe(page => {
+      const sorted = [...page.items].sort((a, b) => b.date.getTime() - a.date.getTime());
       this.activities.set(sorted);
+      this.totalCount.set(page.totalCount);
+      // Sync with server response in case it adjusts values
+      this.pageIndex.set(Math.max(0, (page.page ?? (effectivePageIndex + 1)) - 1));
+      this.pageSize.set(page.pageSize ?? effectivePageSize);
     });
+  }
+
+  onPage(evt: PageEvent) {
+    if (!this.house()) return;
+    this.pageIndex.set(evt.pageIndex);
+    this.pageSize.set(evt.pageSize);
+    this.refresh(this.house()!.id, evt.pageIndex, evt.pageSize);
   }
 
   initials(first?: string, last?: string): string {

@@ -12,10 +12,17 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatIconModule } from '@angular/material/icon';
 import { ExpenseService, SettlementService } from '@application/use-cases';
-import { House } from '@domain/entities';
+import { FinancialActivityType, House } from '@domain/entities';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
-interface DialogData { house: House; }
+interface DialogData {
+  house: House;
+  // For expenses: pass only the id and the type for edit
+  expenseId?: number;
+  activityType?: FinancialActivityType;
+  // For settlements: still passing full activity for now
+  activity?: { id: number; type: FinancialActivityType; description: string; amount: number; date: Date; paidById?: number; paidToId?: number; };
+}
 
 @Component({
   selector: 'app-new-house-expense-dialog',
@@ -39,14 +46,16 @@ interface DialogData { house: House; }
     <h2 mat-dialog-title class="title">Nuevo gasto de casa</h2>
     <div mat-dialog-content class="form">
 
-      <div class="toggle-strip">
-        <mat-button-toggle-group class="mode" [(ngModel)]="type">
-          <mat-button-toggle value="expense">Gasto</mat-button-toggle>
-          <mat-button-toggle value="settlement">Transferencia</mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
+      @if (!isEdit) {
+        <div class="toggle-strip">
+          <mat-button-toggle-group class="mode" [(ngModel)]="type">
+            <mat-button-toggle value="expense">Gasto</mat-button-toggle>
+            <mat-button-toggle value="settlement">Transferencia</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      }
 
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="first">
         <mat-label>Descripción</mat-label>
         <input matInput [(ngModel)]="description" required/>
       </mat-form-field>
@@ -110,7 +119,7 @@ interface DialogData { house: House; }
       @if(type() === 'expense') {
 
 
-
+      @if (!isEdit) {
       <div class="custom-toggle">
         <span class="spacer"></span>
         <button matButton="text" type="button" class="toggle-btn" (click)="customSplit = !customSplit">
@@ -118,8 +127,9 @@ interface DialogData { house: House; }
           <mat-icon class="toggle-icon">{{ customSplit ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
         </button>
       </div>
+      }
 
-      @if (customSplit) {
+      @if (customSplit || isEdit) {
         <div class="custom-split">
           <div class="shares">
             @for (s of shares; track s.roomieId) {
@@ -159,11 +169,11 @@ interface DialogData { house: House; }
       }
       <span class="spacer"></span>
       <button mat-button (click)="close(false)">Cancelar</button>
-      <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">Crear</button>
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="!valid()">{{isEdit ? 'Actualizar' : 'Crear'}}</button>
     </div>
   `,
   styles: [`
-  .toggle-strip { width: 100%; margin: 8px 0 20px 0; }
+  .toggle-strip { width: 100%; margin: 8px 0 12px 0; }
   .mode { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 0 !important;}
   .mode .mat-button-toggle { width: 100%; justify-content: center; }
   .mode .mat-button-toggle-label-content { width: 100%; text-align: center; padding: 12px 0; }
@@ -230,6 +240,8 @@ export class NewHouseExpenseDialogComponent {
   paidToId: number | null = null;
   customSplit = false;
   type = signal<'expense' | 'settlement'>('expense');
+  isEdit = false;
+  editId: number | null = null;
   shares: Array<{
     roomieId: number;
     firstName: string;
@@ -241,34 +253,76 @@ export class NewHouseExpenseDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   ngOnInit() {
-    // Default payer: first member
-    this.paidById = this.data.house.members[0]?.id ?? null;
-    // Initialize shares using payRatio as default percentages
-    const members = this.data.house.members ?? [];
-    const totalPercent = members.reduce((acc, m) => acc + (m.payRatioPercentage ?? m.payRatio * 100), 0);
-    this.shares = members.map(m => ({
-      roomieId: m.id,
-      firstName: m.firstName,
-      lastName: m.lastName,
-      picture: m.picture,
-      amount: 0,
-      percent: totalPercent > 0 ? (m.payRatioPercentage ?? m.payRatio * 100) : (members.length ? 100 / members.length : 0),
-    }));
+    // If editing an expense via id, fetch details (with shares) first
+    if (this.data.expenseId) {
+      this.isEdit = true;
+      this.editId = this.data.expenseId;
+      this.type.set('expense');
+      this.expenseService.getExpenseById(this.data.expenseId).subscribe(exp => {
+        this.description = exp.description || '';
+        this.amount = exp.amount;
+        this.date = new Date(exp.date);
+        const hh = String(this.date.getHours()).padStart(2, '0');
+        const mm = String(this.date.getMinutes()).padStart(2, '0');
+        this.time = `${hh}:${mm}`;
+        this.paidById = exp.paidById;
+        // Prefill shares for editing
+        if (exp.expenseShares?.length) {
+          this.customSplit = true;
+          const sharesMap = new Map(exp.expenseShares.map(s => [s.roomieId, s.shareAmount]));
+          this.shares = (this.data.house.members ?? []).map(m => ({
+            roomieId: m.id,
+            firstName: m.firstName,
+            lastName: m.lastName,
+            picture: m.picture,
+            amount: sharesMap.get(m.id) ?? 0
+          }));
+        }
+      });
+    } else if (this.data.activity) {
+      // Settlement edit path (still passing full activity)
+      const a = this.data.activity;
+      this.isEdit = true;
+      this.editId = a.id;
+      this.description = a.type === FinancialActivityType.SETTLEMENT ? (a.description.split(':')[1]?.trim() || '') : a.description;
+      this.amount = a.amount;
+      this.date = new Date(a.date);
+      const hh = String(this.date.getHours()).padStart(2, '0');
+      const mm = String(this.date.getMinutes()).padStart(2, '0');
+      this.time = `${hh}:${mm}`;
+      this.paidById = a.paidById ?? null;
+      this.paidToId = a.paidToId ?? null;
+      this.type.set('settlement');
+    }
+    // Initialize default shares only if not prefilled by fetch
+    if (!this.shares.length) {
+      const members = this.data.house.members ?? [];
+      const totalPercent = members.reduce((acc, m) => acc + (m.payRatioPercentage ?? m.payRatio * 100), 0);
+      this.shares = members.map(m => ({
+        roomieId: m.id,
+        firstName: m.firstName,
+        lastName: m.lastName,
+        picture: m.picture,
+        amount: 0,
+        percent: totalPercent > 0 ? (m.payRatioPercentage ?? m.payRatio * 100) : (members.length ? 100 / members.length : 0),
+      }));
+    }
 
     // Initialize time from current date
-    const now = this.date;
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    this.time = `${hh}:${mm}`;
+    if (!this.time) {
+      const now = this.date;
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      this.time = `${hh}:${mm}`;
+    }
   }
 
   valid() {
     if (!this.amount || this.amount <= 0) return false;
     if (!this.paidById) return false;
-    // Settlement-specific validation (no date/time required)
+    // Settlement-specific validation (no date/time required for create; we still collect date/time)
     if (this.type() === 'settlement') {
       if (!this.paidToId || !!!this.amount || this.amount <= 0 || !this.paidById) return false;
-      if (!this.date || !this.time) return false;
       if (this.paidToId === this.paidById) return false;
       return true;
     }
@@ -313,20 +367,36 @@ export class NewHouseExpenseDialogComponent {
       }
     }
     if (this.type() === 'settlement') {
-      const payload = {
-        fromRoomieId: this.paidById!,
-        toRoomieId: this.paidToId!,
-        amount: this.amount || 0,
-        houseId: h.id,
-        description: this.description || '',
-        date: dateTime
-      };
+      if (this.isEdit && this.editId) {
+        // Send only changed fields
+        const updatePayload: any = {};
+        if (this.description) updatePayload.description = this.description;
+        if (this.amount) updatePayload.amount = this.amount;
+        if (this.paidById) updatePayload.fromRoomieId = this.paidById;
+        if (this.paidToId) updatePayload.toRoomieId = this.paidToId;
+        if (this.date && this.time) updatePayload.date = dateTime;
 
-      console.log('Saving settlement with payload:', payload);
-      this.settlementService.createSettlement(payload).subscribe((response) => {
-        console.log('Settlement created successfully:', response);
-        this.close(true);
-      });
+        console.log('Updating settlement with payload:', updatePayload);
+        this.settlementService.updateSettlement(this.editId, updatePayload).subscribe((response) => {
+          console.log('Settlement updated successfully:', response);
+          this.close(true);
+        });
+      } else {
+        const payload = {
+          fromRoomieId: this.paidById!,
+          toRoomieId: this.paidToId!,
+          amount: this.amount || 0,
+          houseId: h.id,
+          description: this.description || '',
+          date: dateTime
+        };
+
+        console.log('Saving settlement with payload:', payload);
+        this.settlementService.createSettlement(payload).subscribe((response) => {
+          console.log('Settlement created successfully:', response);
+          this.close(true);
+        });
+      }
       return;
     }
     const payload: any = {
@@ -343,11 +413,19 @@ export class NewHouseExpenseDialogComponent {
     }
 
 
-    console.log("Saving expense with payload:", payload);
-    this.expenseService.createExpense(payload).subscribe((response) => {
-      console.log("Expense created successfully:", response);
-      this.close(true);
-    });
+    if (this.isEdit && this.editId) {
+      console.log('Updating expense with payload:', payload);
+      this.expenseService.updateExpense(this.editId, payload).subscribe((response) => {
+        console.log('Expense updated successfully:', response);
+        this.close(true);
+      });
+    } else {
+      console.log('Saving expense with payload:', payload);
+      this.expenseService.createExpense(payload).subscribe((response) => {
+        console.log('Expense created successfully:', response);
+        this.close(true);
+      });
+    }
   }
 
   close(ok: boolean) { this.dialogRef.close(ok); }

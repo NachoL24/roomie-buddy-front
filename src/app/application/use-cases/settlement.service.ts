@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SettlementRepository, CreateSettlementData } from '../../domain/repositories';
+import { SettlementRepository, CreateSettlementData, UpdateSettlementData } from '../../domain/repositories';
 import { Settlement, BalanceSummary, HouseBalanceSummary } from '../../domain/entities';
 
 @Injectable({
@@ -11,6 +11,10 @@ export class SettlementService {
 
     createSettlement(settlementData: CreateSettlementData): Observable<Settlement> {
         return this.settlementRepository.createSettlement(settlementData);
+    }
+
+    updateSettlement(id: number, settlementData: UpdateSettlementData): Observable<Settlement> {
+        return this.settlementRepository.updateSettlement(id, settlementData);
     }
 
     getHouseSettlements(houseId: number): Observable<Settlement[]> {
@@ -55,8 +59,8 @@ export class SettlementService {
         toRoomieId: number,
         amount: number,
         houseId: number,
-      expenseDescription: string,
-      date: Date
+        expenseDescription: string,
+        date: Date
     ): Observable<Settlement> {
         const description = `Settlement for: ${expenseDescription}`;
         return this.makePayment(fromRoomieId, toRoomieId, amount, houseId, description, date);

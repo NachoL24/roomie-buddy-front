@@ -6,8 +6,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { FinancialActivity, FinancialActivityType } from '@domain/entities';
+import { FinancialActivity, FinancialActivityType, House } from '@domain/entities';
 import { ExpenseService } from '@application/use-cases';
+import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
 
 @Component({
   selector: 'app-house-expense-card',
@@ -137,7 +138,9 @@ import { ExpenseService } from '@application/use-cases';
 })
 export class HouseExpenseCardComponent {
   @Input({ required: true }) activity!: FinancialActivity;
+  @Input({ required: true }) house!: House;
   @Output() deleted = new EventEmitter<void>();
+  @Output() updated = new EventEmitter<void>();
 
   protected activityType = FinancialActivityType;
 
@@ -185,6 +188,17 @@ export class HouseExpenseCardComponent {
   }
 
   onEdit() {
+    const isExpense = this.activity.type === FinancialActivityType.EXPENSE;
+    const data = isExpense
+      ? { house: this.house, expenseId: this.activity.id, activityType: this.activity.type }
+      : { house: this.house, activity: this.activity };
+    const ref = this.dialog.open(NewHouseExpenseDialogComponent, { data });
 
+    ref.afterClosed().subscribe(ok => {
+      if (ok) {
+        this.snackBar.open('Transacción actualizada', 'Cerrar', { duration: 2500 });
+        this.updated.emit();
+      }
+    });
   }
 }

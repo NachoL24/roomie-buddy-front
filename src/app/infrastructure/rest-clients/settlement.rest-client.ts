@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { SettlementRepository, CreateSettlementData } from '../../domain/repositories';
+import { SettlementRepository, CreateSettlementData, UpdateSettlementData } from '../../domain/repositories';
 import { Settlement, BalanceSummary, HouseBalanceSummary } from '../../domain/entities';
 import { SettlementMapper } from '../mappers';
 import { SettlementResponseDto, BalanceSummaryResponseDto, HouseBalanceSummaryResponseDto } from '../dtos';
@@ -23,6 +23,12 @@ export class SettlementRestClient extends SettlementRepository {
         const request = SettlementMapper.toCreateRequest(data);
         return this.http.post<SettlementResponseDto>(`${this.apiBaseUrl}/settlements`, request)
             .pipe(map(SettlementMapper.fromResponse));
+    }
+
+    updateSettlement(id: number, data: UpdateSettlementData): Observable<Settlement> {
+        const request = SettlementMapper.toUpdateRequest(data);
+        return this.http.put<SettlementResponseDto>(`${this.apiBaseUrl}/settlements/${id}`, request)
+            .pipe(map(s => SettlementMapper.fromResponse(s)));
     }
 
     getSettlementsByHouse(houseId: number): Observable<Settlement[]> {
