@@ -8,6 +8,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { NewTransactionDialogComponent } from '../../../pages/dashboard/components/new-transaction-dialog.ng';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TransactionDetailsDialogComponent } from '../transaction-details-dialog/transaction-details-dialog.component';
 import { IncomeService, PersonalExpenseService, GlobalUserService } from '../../../..';
 
 @Component({
@@ -26,6 +27,7 @@ import { IncomeService, PersonalExpenseService, GlobalUserService } from '../../
       class="transaction-card"
       [class.income]="isIncoming"
       [class.expense]="isOutgoing"
+      (click)="openDetails()"
       [matContextMenuTriggerFor]="canEdit ? contextMenu : null">
       <mat-card-content>
         <div class="transaction-content">
@@ -291,6 +293,12 @@ export class TransactionCardComponent implements OnChanges {
           }
         });
       }
+    });
+  }
+
+  openDetails() {
+    this.dialog.open(TransactionDetailsDialogComponent, {
+      data: { activity: this.activity }
     });
   }
 }

@@ -9,6 +9,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { FinancialActivity, FinancialActivityType, House } from '@domain/entities';
 import { ExpenseService, SettlementService } from '@application/use-cases';
 import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashboard/new-house-expense-dialog.component';
+import { TransactionDetailsDialogComponent } from '@presentation/shared/ui/transaction-details-dialog/transaction-details-dialog.component';
 
 @Component({
   selector: 'app-house-expense-card',
@@ -22,7 +23,7 @@ import { NewHouseExpenseDialogComponent } from '@presentation/pages/house-dashbo
     MatDialogModule
   ],
   template: `
-    <mat-card class="transaction-card" [class.expense]="activity.type === activityType.EXPENSE" [class.settlement]="activity.type === activityType.SETTLEMENT" [matContextMenuTriggerFor]="contextMenu">
+  <mat-card class="transaction-card" (click)="openDetails()" [class.expense]="activity.type === activityType.EXPENSE" [class.settlement]="activity.type === activityType.SETTLEMENT" [matContextMenuTriggerFor]="contextMenu">
       <mat-card-content>
         <div class="transaction-content">
           <div class="transaction-left">
@@ -204,6 +205,12 @@ export class HouseExpenseCardComponent {
         this.snackBar.open('Transacción actualizada', 'Cerrar', { duration: 2500 });
         this.updated.emit();
       }
+    });
+  }
+
+  openDetails() {
+    this.dialog.open(TransactionDetailsDialogComponent, {
+      data: { activity: this.activity }
     });
   }
 }
