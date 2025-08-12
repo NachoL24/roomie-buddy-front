@@ -5,6 +5,7 @@ import { MyDashboardComponent } from './presentation/pages/dashboard/my-dashboar
 import { HomepageComponent } from '@presentation/pages/homepage/homepage.component';
 import { AuthCallbackComponent } from '@presentation/pages/auth-callback/auth-callback.component';
 import { HouseDashboardComponent } from './presentation/pages/house-dashboard/house-dashboard.component';
+import { UserProfilePageComponent } from '@presentation/pages/profile/user-profile.ng';
 
 export const routes: Routes = [
   {
@@ -29,6 +30,12 @@ export const routes: Routes = [
     resolve: {
       user: userReadyResolver
     },
+    canActivate: [authGuard]
+  },
+  {
+    path: 'profile',
+    component: UserProfilePageComponent,
+    resolve: { user: userReadyResolver },
     canActivate: [authGuard]
   },
   {

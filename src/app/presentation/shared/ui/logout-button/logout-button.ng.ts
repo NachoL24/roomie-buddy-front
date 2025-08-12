@@ -21,7 +21,7 @@ import { AuthService } from "@auth0/auth0-angular";
   `,
   styles: [
     `
-        .logout-button {
+    .logout-button {
       color: var(--mat-sys-error);
     }
 
@@ -29,12 +29,9 @@ import { AuthService } from "@auth0/auth0-angular";
       color: var(--mat-sys-error);
     }
 
-    .login-button {
-      color: var(--mat-sys-primary);
-    }
-
-    .login-button mat-icon {
-      color: var(--mat-sys-primary);
+    .logout-button:hover {
+      background-color: var(--mat-sys-error-container);
+      color: var(--mat-sys-on-error-container);
     }
   `
   ],

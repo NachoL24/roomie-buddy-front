@@ -7,6 +7,7 @@ export interface CreateUserRequestDto {
 export interface UpdateUserRequestDto {
   firstName?: string;
   lastName?: string;
+  document?: string;
 }
 
 export interface UserResponseDto {

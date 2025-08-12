@@ -1,4 +1,5 @@
 import { Component, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
 import { GlobalUserService } from '@application/use-cases';
 import { User } from '@domain/entities';
@@ -7,7 +8,7 @@ import { User } from '@domain/entities';
   selector: 'user-info',
   imports: [MatDividerModule],
   template: `
-        <div class="user-info-menu">
+        <div class="user-info-menu" (click)="openUserProfile()">
           <div class="row">
           @if (userPic(); as pic) {
             <img class="user-avatar" [src]="pic" alt="User Avatar" />
@@ -24,6 +25,12 @@ import { User } from '@domain/entities';
   styles: [`
     .user-info-menu {
       padding: 12px 16px;
+    }
+
+    .user-info-menu:hover {
+      background-color: var(--mat-sys-secondary-container);
+      color: var(--mat-sys-on-secondary-container);
+      cursor: pointer;
     }
 
     .row {
@@ -54,7 +61,7 @@ import { User } from '@domain/entities';
 })
 export class UserInfoComponent {
 
-  constructor(public userState: GlobalUserService) { }
+  constructor(public userState: GlobalUserService, private router: Router) { }
 
   userName = computed(() => {
     if (this.userState.isLoggedIn()) {
@@ -92,4 +99,8 @@ export class UserInfoComponent {
     }
     return null;
   });
+
+  openUserProfile() {
+    this.router.navigateByUrl('/profile');
+  }
 }

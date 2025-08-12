@@ -25,7 +25,8 @@ export class UserMapper {
   static toUpdateRequest(user: Partial<User>): UpdateUserRequestDto {
     return {
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      document: user.doc
     };
   }
 }

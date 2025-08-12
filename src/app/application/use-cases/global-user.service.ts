@@ -59,6 +59,13 @@ export class GlobalUserService {
   /** Útil tras editar el perfil */
   refresh() { this.loadedOnce = false; this.ensureLoaded(); }
 
+  /** Permite setear el usuario luego de una actualización explícita */
+  setUser(u: User | null) {
+    this._user.set(u);
+    this._ready.set(!!u);
+    if (u) this.loadedOnce = true;
+  }
+
   /** Limpiar estado al desloguear o expirar sesión */
   private reset() {
     this._user.set(null);
