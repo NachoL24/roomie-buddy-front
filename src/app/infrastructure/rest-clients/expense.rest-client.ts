@@ -26,7 +26,7 @@ export class ExpenseRestClient extends ExpenseRepository {
     createExpense(data: CreateExpenseData): Observable<HouseExpense> {
         const request = HouseExpenseMapper.toCreateRequest(data);
         return this.http.post<HouseExpenseResponseDto>(`${this.apiBaseUrl}/expenses/house`, request)
-            .pipe(map(HouseExpenseMapper.fromResponse));
+            .pipe(map(expense => HouseExpenseMapper.fromResponse(expense)));
     }
 
     getExpenseById(id: number): Observable<HouseExpense> {
