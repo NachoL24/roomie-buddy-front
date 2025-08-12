@@ -1,10 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { HouseService, GlobalUserService } from '@application/use-cases';
 import { HouseMinimal } from '@domain/entities';
 import { MatButtonModule } from '@angular/material/button';
@@ -107,7 +107,7 @@ import { Router } from '@angular/router';
     }
   `]
 })
-export class DrawerNavComponent implements OnInit {
+export class DrawerNavComponent implements OnInit, OnDestroy {
   private houseService = inject(HouseService);
   private userService = inject(GlobalUserService);
   private dialog = inject(MatDialog);
@@ -115,6 +115,7 @@ export class DrawerNavComponent implements OnInit {
   private router = inject(Router);
 
   houses$!: Observable<HouseMinimal[]>;
+  private destroy$ = new Subject<void>();
 
   ngOnInit() {
     // Obtener las casas del usuario actual
@@ -122,6 +123,19 @@ export class DrawerNavComponent implements OnInit {
     if (currentUser) {
       this.houses$ = this.houseService.getHousesByRoomieId(currentUser.id);
     }
+
+    // Reaccionar a refresh externos (p.ej., aceptar invitación)
+    this.houseService.refresh$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const user = this.userService.user();
+        if (user) this.houses$ = this.houseService.getHousesByRoomieId(user.id);
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   createHouse() {

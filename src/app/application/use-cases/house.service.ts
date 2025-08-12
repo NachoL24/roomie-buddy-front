@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { HouseRepository, PayRatioUpdate } from '../../domain/repositories';
 import { House, HouseMinimal } from '../../domain/entities';
 
@@ -7,6 +7,11 @@ import { House, HouseMinimal } from '../../domain/entities';
   providedIn: 'root'
 })
 export class HouseService {
+  private _refresh$ = new Subject<void>();
+
+  // Notificar a interesados que deben refrescar sus listas de casas
+  refresh$ = this._refresh$.asObservable();
+
   constructor(private houseRepository: HouseRepository) { }
 
   getHouseById(id: number): Observable<House> {
@@ -39,5 +44,10 @@ export class HouseService {
 
   deleteHouse(id: number): Observable<void> {
     return this.houseRepository.deleteHouse(id);
+  }
+
+  // Disparar un refresh manual tras cambios (p.ej., aceptar invitación)
+  triggerRefresh() {
+    this._refresh$.next();
   }
 }

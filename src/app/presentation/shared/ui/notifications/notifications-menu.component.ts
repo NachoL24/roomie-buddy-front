@@ -5,7 +5,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { InvitationService } from "@application/use-cases";
+import { InvitationService, HouseService } from "@application/use-cases";
 import { Invitation } from "@domain/entities";
 import { Subject, timer } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
@@ -76,6 +76,7 @@ import { switchMap, takeUntil } from 'rxjs/operators';
 })
 export class NotificationsMenuComponent implements OnInit, OnDestroy {
   service = inject(InvitationService);
+  houseService = inject(HouseService);
   snack = inject(MatSnackBar);
   notifications = signal<Invitation[]>([]);
   private destroy$ = new Subject<void>();
@@ -99,6 +100,8 @@ export class NotificationsMenuComponent implements OnInit, OnDestroy {
     this.service.acceptInvitation(notification.id).subscribe(() => {
       this.notifications.update(notifs => notifs.filter(n => n.id !== notification.id));
       this.snack.open("Invitación aceptada", "Cerrar", { duration: 3000 });
+      // actualizar casas en el drawer
+      this.houseService.triggerRefresh();
     });
   }
 
@@ -106,6 +109,8 @@ export class NotificationsMenuComponent implements OnInit, OnDestroy {
     this.service.declineInvitation(notification.id).subscribe(() => {
       this.notifications.update(notifs => notifs.filter(n => n.id !== notification.id));
       this.snack.open("Invitación rechazada", "Cerrar", { duration: 3000 });
+      // puede que no sea necesario, pero si el backend cambia estado, refrescamos
+      this.houseService.triggerRefresh();
     });
   }
 }
