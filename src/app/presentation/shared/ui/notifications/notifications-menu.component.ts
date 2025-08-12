@@ -1,3 +1,4 @@
+import { DatePipe } from "@angular/common";
 import { Component, inject, OnInit, OnDestroy, signal } from "@angular/core";
 import { MatBadgeModule } from "@angular/material/badge";
 import { MatButtonModule } from "@angular/material/button";
@@ -11,35 +12,65 @@ import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: "app-notifications-menu",
-  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatBadgeModule],
+  imports: [MatButtonModule, MatIconModule, MatMenuModule, MatBadgeModule, DatePipe],
   template: `
     <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Notifications">
-      <mat-icon [matBadge]="notifications().length" matBadgeColor="accent">notifications</mat-icon>
+      <mat-icon [matBadge]="notifications().length > 0 ? notifications().length : null" matBadgeColor="accent">notifications</mat-icon>
     </button>
-    <mat-menu #menu="matMenu" class="menu">
+  <mat-menu #menu="matMenu">
+    @if (notifications().length === 0) {
+      <div mat-menu-item disabled>No hay notificaciones</div>
+    } @else {
       @for (notification of notifications(); track notification.id) {
-        <div class="item">
-          <mat-icon>description</mat-icon>
-          <span>{{ notification.inviterName }} te ha invitado a unirte a la casa '{{ notification.houseName }}'</span>
-          <button mat-icon-button color="primary" (click)="acceptInvitation(notification)">
-            <mat-icon>check</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="declineInvitation(notification)">
-            <mat-icon>close</mat-icon>
-          </button>
+        <div mat-menu-item class="item">
+          <mat-icon class="leading">description</mat-icon>
+          <div class="description">
+            <span class="text">{{ notification.inviterName }} te ha invitado a unirte a la casa '{{ notification.houseName }}'</span>
+            <span class="email">{{ notification.inviterEmail }}</span>
+            <span class="time">{{ notification.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="actions">
+            <button mat-icon-button color="primary" (click)="acceptInvitation(notification)" aria-label="Aceptar invitación">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="declineInvitation(notification)" aria-label="Rechazar invitación">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
         </div>
       }
+    }
     </mat-menu>
   `,
   styles: [`
+    /* Ensancha el panel y permite scroll si hay muchas notificaciones */
+    ::ng-deep .mat-mdc-menu-panel {
+      width: auto;            /* que el contenido defina */
+      max-width: 90vw !important;        /* no exceder viewport */
+    }
+
+    ::ng-deep .mat-mdc-menu-item-text {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 8px 0;
+      gap: 12px;
+    }
     .item {
       display: flex;
-      flex-direction: row;
+      flex-direction: row !important;
       align-items: center;
-      justify-content: space-between;
     }
-    .menu {
-      width: 600px !important;
+    .description {
+      display: flex;
+      flex-direction: column;
+    }
+    .text {
+      max-width: 320px;
+    }
+    .actions {
+      display: flex;
+      flex-direction: row;
     }
   `]
 })
