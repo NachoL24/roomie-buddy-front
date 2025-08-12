@@ -2,6 +2,7 @@ import { effect, inject, Injectable, signal } from '@angular/core';
 import { GlobalUserService } from '@application/use-cases';
 import { AuthService } from '@auth0/auth0-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ export class LoadingService {
   private _isLoading = signal(true);
   private globalUserService = inject(GlobalUserService);
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   // Auth0 states as signals
   private isAuthenticated = toSignal(this.auth.isAuthenticated$, { initialValue: false });
@@ -49,12 +51,15 @@ export class LoadingService {
         this.hide();
       }
     });
-  } show() {
+  }
+
+  show() {
     this._isLoading.set(true);
   }
 
   hide() {
     this._isLoading.set(false);
+    this.router.navigate(['/dashboard']);
   }
 
   toggle() {

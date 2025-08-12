@@ -75,8 +75,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
       margin-bottom: 24px;
     }
     .container {
-      max-width: 800px;
-      margin: 24px auto;
       padding: 0 16px;
     }
     .form {
@@ -166,6 +164,13 @@ export class UserProfilePageComponent {
         this.form.controls.doc.enable({ emitEvent: false });
       }
     });
+
+    if (!u?.profileCompleted) {
+      this.snack.open('Por favor complete su perfil antes de continuar', 'Cerrar', {
+        verticalPosition: 'top',
+        horizontalPosition: "end"
+      });
+    }
   }
 
   goBack() {
@@ -193,7 +198,9 @@ export class UserProfilePageComponent {
       },
       complete: () => {
         this.saving.set(false);
+        this.snack.dismiss();
         this.snack.open('Perfil actualizado con éxito', 'Cerrar');
+        this.goBack();
       }
     });
   }
