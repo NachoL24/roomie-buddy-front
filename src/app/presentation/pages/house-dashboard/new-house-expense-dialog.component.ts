@@ -81,7 +81,7 @@ interface DialogData {
             <mat-option [value]="m.id">
               <div class="option">
                 @if (m.picture) {
-                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
+                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async" width="40" height="40"/>
                 } @else {
                   <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
                 }
@@ -100,7 +100,7 @@ interface DialogData {
             <mat-option [value]="m.id">
               <div class="option">
                 @if (m.picture) {
-                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
+                  <img class="avatar" [src]="m.picture!" [alt]="m.firstName + ' ' + m.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async" width="40" height="40"/>
                 } @else {
                   <div class="avatar initials">{{ initials(m.firstName, m.lastName) }}</div>
                 }
@@ -144,7 +144,7 @@ interface DialogData {
               <div class="share-row">
                 <div class="user">
                   @if (s.picture) {
-                    <img class="avatar" [src]="s.picture!" [alt]="s.firstName + ' ' + s.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
+                    <img class="avatar" [src]="s.picture!" [alt]="s.firstName + ' ' + s.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async" width="40" height="40"/>
                   } @else {
                     <div class="avatar initials">{{ initials(s.firstName, s.lastName) }}</div>
                   }

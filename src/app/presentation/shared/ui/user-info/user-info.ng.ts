@@ -11,7 +11,7 @@ import { User } from '@domain/entities';
         <div class="user-info-menu" (click)="openUserProfile()">
           <div class="row">
           @if (userPic(); as pic) {
-            <img class="user-avatar" [src]="pic" alt="User Avatar" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
+            <img class="user-avatar" [src]="pic" alt="User Avatar" alt="avatar" loading="eager" fetchpriority="high" decoding="async" width="40" height="40"/>
           }
           <div class="user-info">
           <div class="user-name">{{ userName() }}</div>
