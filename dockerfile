@@ -1,15 +1,20 @@
 # --- Build stage ------------------------------------------------------------
 FROM node:20-alpine AS build
 
+RUN apk add --no-cache curl bash \
+  && curl -fsSL https://bun.sh/install | bash \
+  && mv ~/.bun/bin/bun /usr/local/bin/ \
+  && bun --version
+
 WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install --no-audit --no-fund
+RUN echo "Instalando con Bun…" && bun install --frozen-lockfile
 
 # Copy source and build
 COPY . .
-RUN npm run build
+RUN bun run build
 
 
 # --- Runtime stage ----------------------------------------------------------
