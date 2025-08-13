@@ -31,7 +31,7 @@ interface DialogData {
           <div class="row">
             <div class="member">
               @if (m.picture) {
-                <img class="avatar" [ngSrc]="m.picture!" width="40" height="40" [alt]="m.firstName + ' ' + m.lastName" />
+                <img class="avatar" [ngSrc]="m.picture!" width="40" height="40" [alt]="m.firstName + ' ' + m.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
               } @else {
                 <div class="avatar">{{ initials(m.firstName, m.lastName) }}</div>
               }

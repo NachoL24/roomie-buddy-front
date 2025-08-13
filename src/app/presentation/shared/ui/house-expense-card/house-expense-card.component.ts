@@ -33,12 +33,12 @@ import { TransactionDetailsDialogComponent } from '@presentation/shared/ui/trans
                 {{ activity.type === activityType.EXPENSE ? 'trending_down' : 'swap_horiz' }}
               </mat-icon>
               @if (activity.paidByPicture) {
-                <img class="payer-avatar" [ngSrc]="activity.paidByPicture!" width="24" height="24" alt="payer" />
+                <img class="payer-avatar" [ngSrc]="activity.paidByPicture!" width="24" height="24" alt="payer" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
               } @else if (activity.paidByName) {
                 <span class="payer-avatar initials">{{ payerInitials() }}</span>
               }
               @if (activity.type === activityType.SETTLEMENT && activity.paidToPicture) {
-                <img class="paid-avatar" [ngSrc]="activity.paidToPicture!" width="24" height="24" alt="receiver" />
+                <img class="paid-avatar" [ngSrc]="activity.paidToPicture!" width="24" height="24" alt="receiver" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
               }
             </div>
           </div>

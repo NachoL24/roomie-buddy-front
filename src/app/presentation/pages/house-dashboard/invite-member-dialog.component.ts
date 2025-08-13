@@ -34,7 +34,7 @@ interface DialogData { houseId: number; roomies: User[]; }
               @for (user of users; track user.id) {
                 <mat-card>
                   <mat-card-content class="user-card">
-                    <img class="user-pic" [src]="user.pic" alt="{{ user.firstName }} {{ user.lastName }}">
+                    <img class="user-pic" [src]="user.pic" alt="{{ user.firstName }} {{ user.lastName }}" alt="avatar" loading="eager" fetchpriority="high" decoding="async">
                     <div class="user-info">
                       <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
                       <span class="user-email">{{ user.email }}</span>

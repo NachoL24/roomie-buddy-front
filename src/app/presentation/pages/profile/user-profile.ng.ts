@@ -31,7 +31,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
       <div class="user-pic">
         <div class="avatar">
               @if (userPic(); as pic) {
-                <img [ngSrc]="pic" alt="Avatar" height="100" width="100" priority="true" />
+                <img [ngSrc]="pic" alt="Avatar" height="100" width="100" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
               }
         </div>
       </div>

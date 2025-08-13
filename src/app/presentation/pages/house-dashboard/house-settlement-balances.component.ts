@@ -20,7 +20,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
             @for (e of entries(); track e.id) {
               <div class="detail">
                 @if (e.member?.picture) {
-                  <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" />
+                  <img class="avatar" [src]="e.member!.picture!" [alt]="(e.member!.firstName + ' ' + e.member!.lastName)" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
                 } @else {
                   <div class="avatar">{{ initials(e.member?.firstName, e.member?.lastName) }}</div>
                 }

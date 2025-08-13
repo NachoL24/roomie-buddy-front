@@ -74,7 +74,7 @@ import { NavigationService } from '@presentation/shared/services';
           <ul class="member-list">
             <li *ngFor="let m of house()?.members" class="member-item">
                @if (m.picture) {
-                <img class="avatar" [ngSrc]="m.picture!" width="40" height="40" [alt]="m.firstName + ' ' + m.lastName" />
+                <img class="avatar" [ngSrc]="m.picture!" width="40" height="40" [alt]="m.firstName + ' ' + m.lastName" alt="avatar" loading="eager" fetchpriority="high" decoding="async"/>
                } @else {
               <div class="avatar">
                 {{ initials(m.firstName, m.lastName) }}
