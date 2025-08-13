@@ -366,7 +366,7 @@ export class HouseDashboardComponent implements OnInit {
     this.houseService.updateHouseName(this.house()!.id, newName).subscribe({
       next: (updated) => {
         this.house.set({ ...this.house()!, name: updated.name });
-        this.houseService.triggerRefresh();
+        this.navigationService.refreshHouses();
         this.snackBar.open('Nombre actualizado', 'Cerrar', { duration: 2500 });
         this.isEditingName.set(false);
         this.saving.set(false);

@@ -15,6 +15,7 @@ export class NavigationService {
   private drawerMode = signal<"side" | "over">("side");
   private device = signal<"mobile" | "desktop">("desktop");
   private destroyRef = inject(DestroyRef);
+  refreshHousesNeeded = signal(false);
 
   constructor() {
     const compute = (w: number) => ({
@@ -79,5 +80,13 @@ export class NavigationService {
 
   closeDrawer() {
     this.drawerOpen = false;
+  }
+
+  refreshHouses() {
+    this.refreshHousesNeeded.set(true);
+  }
+
+  finishRefresh() {
+    this.refreshHousesNeeded.set(false);
   }
 }

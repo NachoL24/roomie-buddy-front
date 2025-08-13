@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
@@ -40,7 +40,7 @@ import { NavigationService } from '@presentation/shared/services';
         <!-- Mis Casas Section -->
         <h3 matSubheader>Mis Casas</h3>
 
-        @if (houses$ | async; as houses) {
+        @if (houseslist(); as houses) {
           @for (house of houses; track house.id) {
             <a mat-list-item
                [routerLink]="['/house', house.id, 'dashboard']"
@@ -117,22 +117,36 @@ export class DrawerNavComponent implements OnInit, OnDestroy {
   navigationService = inject(NavigationService);
 
   houses$!: Observable<HouseMinimal[]>;
+  houseslist = signal<HouseMinimal[]>([]);
   private destroy$ = new Subject<void>();
+
+  constructor() {
+    effect(() => {
+      if (this.navigationService.refreshHousesNeeded()) {
+        this.houseService.getHousesByRoomieId(this.userService.user()!.id).subscribe(houses => {
+          // Defer update to avoid changing bindings mid-change-detection
+          setTimeout(() => {
+            this.houseslist.set(houses);
+            this.navigationService.finishRefresh();
+          }, 0);
+        });
+      }
+    });
+  }
 
   ngOnInit() {
     // Obtener las casas del usuario actual
     const currentUser = this.userService.user();
     if (currentUser) {
-      this.houses$ = this.houseService.getHousesByRoomieId(currentUser.id);
+      this.houseService.getHousesByRoomieId(currentUser.id).subscribe(houses => {
+        // Defer initial list set to avoid ExpressionChanged after first render
+        setTimeout(() => {
+          this.houseslist.set(houses);
+        }, 0);
+      });
     }
 
-    // Reaccionar a refresh externos (p.ej., aceptar invitación)
-    this.houseService.refresh$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        const user = this.userService.user();
-        if (user) this.houses$ = this.houseService.getHousesByRoomieId(user.id);
-      });
+
   }
 
   ngOnDestroy() {
@@ -154,11 +168,8 @@ export class DrawerNavComponent implements OnInit, OnDestroy {
       this.houseService.createHouse(trimmed).subscribe({
         next: (house) => {
           this.snackBar.open('Casa creada', 'Cerrar', { duration: 2500 });
-          // refrescar listado
-          const currentUser = this.userService.user();
-          if (currentUser) {
-            this.houses$ = this.houseService.getHousesByRoomieId(currentUser.id);
-          }
+          // refrescar listado mediante NavigationService para unificar lógica
+          this.navigationService.refreshHouses();
           // navegar a la nueva casa
           this.router.navigate(['/house', house.id, 'dashboard']);
         },
