@@ -41,7 +41,7 @@ import { HouseInvitationListComponent } from "./house-invitation-list.component"
               }
             </div>
           } @else {
-            <div class="empty">No transactions yet</div>
+            <div class="empty">No hay transacciones aún</div>
           }
 
           <mat-paginator
