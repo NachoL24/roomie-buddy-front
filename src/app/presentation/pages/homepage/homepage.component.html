@@ -71,11 +71,12 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-card class="feature-card">
+      <mat-card class="feature-card proximamente">
         <mat-card-header>
           <div mat-card-avatar class="avatar">
             <mat-icon>support</mat-icon>
           </div>
+          <span>(proximamente)</span>
           <mat-card-title>Soporte Multimoneda</mat-card-title>
         </mat-card-header>
         <mat-card-content>
@@ -99,21 +100,21 @@
       <mat-card class="pricing-card basic-plan">
         <mat-card-header>
           <mat-card-title>Básico</mat-card-title>
-          <mat-card-subtitle>Gratis /mes</mat-card-subtitle>
+          <mat-card-subtitle>Gratis</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
           <button mat-raised-button class="plan-btn">Comenzar</button>
           <ul class="features-list">
             <li><mat-icon>check</mat-icon> Gestión de Finanzas Personales</li>
             <li><mat-icon>check</mat-icon> Informes Básicos</li>
-            <li><mat-icon>check</mat-icon> 1 Casa</li>
-            <li><mat-icon>check</mat-icon> Hasta 5 Usuarios</li>
+            <li><mat-icon>check</mat-icon> "Dueño" de 1 Casa con hasta 4 usuarios</li>
+            <li><mat-icon>check</mat-icon> Pertenece a casas ilimitadas</li>
           </ul>
         </mat-card-content>
       </mat-card>
 
       <!-- Premium Plan -->
-      <mat-card class="pricing-card premium-plan">
+      <mat-card class="pricing-card premium-plan proximamente">
         <mat-card-header>
           <div class="popular-badge">Popular</div>
           <mat-card-title>Premium</mat-card-title>
@@ -126,33 +127,30 @@
             class="plan-btn"
             (click)="onUpgrade()"
           >
-            Actualizar
+            Proximamente
           </button>
           <ul class="features-list">
-            <li><mat-icon>check</mat-icon> Todo en Básico</li>
+            <li><mat-icon>check</mat-icon> Todo lo del plan Básico</li>
             <li><mat-icon>check</mat-icon> Gestión de Finanzas Grupales</li>
             <li><mat-icon>check</mat-icon> Informes Avanzados</li>
-            <li><mat-icon>check</mat-icon> 5 Casas</li>
-            <li><mat-icon>check</mat-icon> Hasta 5 Usuarios por Casa</li>
+            <li><mat-icon>check</mat-icon> "Dueño" de hasta 5 Casas con hasta 5 Usuarios por Casa</li>
           </ul>
         </mat-card-content>
       </mat-card>
 
       <!-- Unlimited Plan -->
-      <mat-card class="pricing-card unlimited-plan">
+      <mat-card class="pricing-card unlimited-plan proximamente">
         <mat-card-header>
           <mat-card-title>Ilimitado</mat-card-title>
           <mat-card-subtitle>$30.00 /mes</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
           <button mat-raised-button class="plan-btn" (click)="onContactSales()">
-            Contactar a Ventas
+            Proximamente
           </button>
           <ul class="features-list">
-            <li><mat-icon>check</mat-icon> Soluciones Personalizadas</li>
-            <li><mat-icon>check</mat-icon> Soporte Dedicado</li>
-            <li><mat-icon>check</mat-icon> Casas Ilimitadas</li>
-            <li><mat-icon>check</mat-icon> 10 Usuarios por Casa</li>
+            <li><mat-icon>check</mat-icon> Todo lo del plan Premium</li>
+            <li><mat-icon>check</mat-icon> Casas y usuarios Ilimitados</li>
           </ul>
         </mat-card-content>
       </mat-card>

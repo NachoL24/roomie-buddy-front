@@ -78,7 +78,6 @@
   padding: 10px 0;
 
   .section-content {
-
     .section-title {
       font-size: 2.5rem;
       font-weight: 700;
@@ -199,7 +198,7 @@
         mat-card-subtitle {
           font-size: 2rem;
           font-weight: 700;
-          color: var(--mat-sys-on-primary-fixed-variant);
+          color: var(--mat-sys-primary);
           margin-top: 12px;
         }
       }
@@ -228,7 +227,7 @@
           margin-bottom: 6px;
 
           mat-icon {
-            color: #4caf50;
+            color: var(--mat-sys-primary-container);
             margin-right: 12px;
             font-size: 20px;
           }
@@ -236,6 +235,13 @@
       }
     }
   }
+}
+
+.proximamente {
+  /* Make upcoming sections/cards look disabled with a grayer tone */
+  opacity: 0.45;
+  filter: grayscale(100%) saturate(20%);
+  pointer-events: none;
 }
 
 // Responsive design
