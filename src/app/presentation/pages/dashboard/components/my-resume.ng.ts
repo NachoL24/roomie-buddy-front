@@ -21,7 +21,7 @@ import { MatIconModule } from "@angular/material/icon";
         <div mat-card-avatar class="avatar">
           <mat-icon>account_balance_wallet</mat-icon>
           </div>
-        <mat-card-title class="title">Ingresos</mat-card-title>
+        <mat-card-title class="title">Ingresos de este mes</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <p class="money income">{{ expenses()?.MonthIncome | currency }}</p>
@@ -32,7 +32,7 @@ import { MatIconModule } from "@angular/material/icon";
         <div mat-card-avatar class="avatar">
           <mat-icon>payments</mat-icon>
           </div>
-        <mat-card-title class="title">Gastos</mat-card-title>
+        <mat-card-title class="title">Gastos de este mes</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <p class="money expense">{{ expenses()?.MonthExpenses | currency }}</p>
@@ -66,7 +66,6 @@ import { MatIconModule } from "@angular/material/icon";
       width: 100%;
       height: 110px;
       transition: all 0.2s ease;
-      cursor: pointer;
     }
 
     .card:hover {
