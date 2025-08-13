@@ -10,12 +10,18 @@ import { ThemeSwitcherComponent } from "../theme-switcher/theme-switcher";
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { NotificationsMenuComponent } from "../notifications/notifications-menu.component";
+import { DrawerComponent } from "../drawer/drawer.ng";
 
 @Component({
   selector: 'app-toolbar',
   imports: [MatToolbarModule, MatButtonModule, MatIconModule, UserMenuComponent, MatMenuModule, ThemeSwitcherComponent, CommonModule, NotificationsMenuComponent],
   template: `
     <mat-toolbar class="toolbar">
+      @if (globalUser.isLoggedIn()) {
+        <button mat-icon-button class="menu-button" (click)="navigationService.toggleDrawer()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
       @if (theme.resolvedTheme() === 'dark') {
         <img src="assets/icon-light.png" alt="Logo" class="logo"/>
       } @else {

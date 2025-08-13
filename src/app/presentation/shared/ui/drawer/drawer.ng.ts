@@ -2,6 +2,7 @@ import { Component, inject } from "@angular/core";
 import { MatSidenavModule } from "@angular/material/sidenav";
 import { GlobalUserService } from "@application/use-cases";
 import { DrawerNavComponent } from "../drawer-nav/drawer-nav.component";
+import { NavigationService } from "@presentation/shared/services";
 
 @Component({
   selector: "app-drawer",
@@ -12,7 +13,7 @@ import { DrawerNavComponent } from "../drawer-nav/drawer-nav.component";
   ],
   template: `
     <mat-drawer-container class="drawer-container">
-      <mat-drawer mode="side" [opened]="userState.isLoggedIn()" class="drawer">
+      <mat-drawer [mode]="navigationService.getDrawerMode()" [opened]="navigationService.isDrawerOpen()" class="drawer">
         <app-drawer-nav></app-drawer-nav>
       </mat-drawer>
       <mat-drawer-content>
@@ -31,16 +32,14 @@ import { DrawerNavComponent } from "../drawer-nav/drawer-nav.component";
       width: 260px;
     }
 
-    mat-drawer-content {
-      margin-left: 0;
-      transition: margin-left 0.3s ease;
-    }
-
-    mat-drawer-container.mat-drawer-container-has-open mat-drawer-content {
-      margin-left: 220px;
+    @media(max-width: 660px) {
+      .drawer {
+        width: 100%;
+      }
     }
   `]
 })
 export class DrawerComponent {
   public userState = inject(GlobalUserService);
+  public navigationService = inject(NavigationService);
 }
