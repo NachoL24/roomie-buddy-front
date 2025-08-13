@@ -12,6 +12,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CreateHouseDialogComponent } from '@presentation/shared/ui/create-house-dialog/create-house-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { NavigationService } from '@presentation/shared/services';
 
 @Component({
   selector: 'app-drawer-nav',
@@ -30,7 +31,7 @@ import { Router } from '@angular/router';
       <mat-nav-list>
         <!-- Mis Finanzas Section -->
         <h3 matSubheader>Mis Finanzas</h3>
-        <a mat-list-item routerLink="/dashboard" routerLinkActive="active-item">
+        <a mat-list-item routerLink="/dashboard" routerLinkActive="active-item" (click)="navigationAction()">
           <mat-icon matListItemIcon>account_balance_wallet</mat-icon>
           <span matListItemTitle>Finanzas Personales</span>
         </a>
@@ -43,7 +44,7 @@ import { Router } from '@angular/router';
           @for (house of houses; track house.id) {
             <a mat-list-item
                [routerLink]="['/house', house.id, 'dashboard']"
-               routerLinkActive="active-item">
+               routerLinkActive="active-item" (click)="navigationAction()">
               <mat-icon matListItemIcon>home</mat-icon>
               <span matListItemTitle>{{ house.name }}</span>
             </a>
@@ -113,6 +114,7 @@ export class DrawerNavComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  navigationService = inject(NavigationService);
 
   houses$!: Observable<HouseMinimal[]>;
   private destroy$ = new Subject<void>();
@@ -166,5 +168,11 @@ export class DrawerNavComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  navigationAction() {
+    if (this.navigationService.isMobile()) {
+      this.navigationService.closeDrawer();
+    }
   }
 }

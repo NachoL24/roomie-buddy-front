@@ -15,6 +15,7 @@ import { PayRatioDialogComponent } from './pay-ratio-dialog.component';
 import { HouseSettlementBalancesComponent } from './house-settlement-balances.component';
 import { HouseInvitationListComponent } from "./house-invitation-list.component";
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { NavigationService } from '@presentation/shared/services';
 
 @Component({
   selector: 'app-house-dashboard',
@@ -31,7 +32,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
           <div class="header">
             <div class="header-content">
             <h2 class="table-title">Transacciones</h2>
-            <mat-icon class="info-icon" matTooltip="Click derecho en una transacción para más opciones">info</mat-icon>
+            <mat-icon class="info-icon" matTooltip="{{navigationService.isMobile() ? 'Manten presionado' : 'Click derecho en'}} una transacción para más opciones">info</mat-icon>
             </div>
             <button class="new-transaction-button" mat-flat-button color="primary" (click)="openNewExpense()">
               <mat-icon>add</mat-icon>
@@ -199,6 +200,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class HouseDashboardComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private houseService = inject(HouseService);
+  navigationService = inject(NavigationService);
   private activityService = inject(FinancialActivityService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);

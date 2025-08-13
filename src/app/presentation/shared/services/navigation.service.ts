@@ -76,4 +76,8 @@ export class NavigationService {
   isDesktop() {
     return this.device() === "desktop";
   }
+
+  closeDrawer() {
+    this.drawerOpen = false;
+  }
 }

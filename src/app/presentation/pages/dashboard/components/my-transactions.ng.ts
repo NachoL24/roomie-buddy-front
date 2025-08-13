@@ -11,6 +11,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { NewTransactionDialogComponent } from "./new-transaction-dialog.ng";
 import { MyResumeComponent } from "./my-resume.ng";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { NavigationService } from "@presentation/shared/services";
 
 @Component({
   selector: "app-my-transactions",
@@ -28,7 +29,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
       <div class="transactions-header">
         <div class="header-content">
           <h1 class="title">Últimas Transacciones</h1>
-          <mat-icon class="info-icon" matTooltip="Click derecho en una transacción para más opciones">info</mat-icon>
+          <mat-icon class="info-icon" matTooltip="{{navigationService.isMobile() ? 'Manten presionado' : 'Click derecho en'}} una transacción para más opciones">info</mat-icon>
         </div>
         <button class="new-transaction-button" matButton="filled" color="primary" (click)="newTransaction()">Nueva Transacción</button>
       </div>
@@ -151,12 +152,6 @@ import { MatTooltipModule } from "@angular/material/tooltip";
       margin-top: 8px;
     }
 
-    @media (max-width: 768px) {
-      .transactions-container {
-        padding: 12px;
-      }
-    }
-
     @media (max-width: 600px) {
       .transactions-header {
         flex-direction: column;
@@ -172,6 +167,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 })
 export class MyTransactionsComponent implements OnInit {
   @Input() resumeComponent?: MyResumeComponent;
+  navigationService = inject(NavigationService);
 
   activitiesService = inject(FinancialActivityService);
   dialog = inject(MatDialog);
