@@ -54,6 +54,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
             [pageSize]="pageSize()"
             [pageSizeOptions]="pageSizeOptions"
             (page)="onPage($event)"
+            class="paginator"
           />
         </section>
 
@@ -185,6 +186,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       }
       .new-transaction-button {
         width: 100%;
+      }
+    }
+
+    @media (max-width: 450px) {
+      .paginator {
+        margin-top: 8px;
       }
     }
   `]
