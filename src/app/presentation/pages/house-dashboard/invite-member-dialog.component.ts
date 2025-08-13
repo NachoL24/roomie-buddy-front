@@ -118,7 +118,7 @@ export class InviteMemberDialogComponent implements OnInit {
   ngOnInit() {
     this.email.valueChanges.pipe(debounceTime(300)).subscribe(value => {
       this.loading.set(true);
-      this.userService.findUserByEmail(this.email.value).subscribe(users => {
+      this.userService.findUserByEmail(this.email.value, this.data.houseId).subscribe(users => {
         this.users = users;
         this.loading.set(false);
       });
@@ -130,12 +130,6 @@ export class InviteMemberDialogComponent implements OnInit {
   }
 
   close(ok: boolean) { this.dialogRef.close(ok); }
-
-  searchUser() {
-    this.userService.findUserByEmail(this.email.value).subscribe(users => {
-      this.users = users;
-    });
-  }
 
   inviteUser(user: User) {
     this.invitationService.inviteUserToHouse(user.email, this.data.houseId).subscribe(() => this.close(true));

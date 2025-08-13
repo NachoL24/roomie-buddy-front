@@ -37,11 +37,19 @@ export class UserRestClient extends UserRepository {
     return this.http.get(`${this.apiBaseUrl}/user-metadata`);
   }
 
-  findUserByEmail(email: string): Observable<User[]> {
-    return this.http.get<UserResponseDto[]>(`${this.apiBaseUrl}/user/email/${email}`)
+  findUserByEmail(email: string, houseId: number): Observable<User[]> {
+    return this.http.get<UserResponseDto[]>(`${this.apiBaseUrl}/user/search?email=${email}&houseId=${houseId}`)
       .pipe(
         map(users => users.length > 0 ? users.map(UserMapper.fromResponse) : []),
         shareReplay(1) // Cache the result for subsequent calls
       );
   }
+
+  findUserById(inviteeId: number): Observable<User> {
+    return this.http.get<UserResponseDto>(`${this.apiBaseUrl}/user/${inviteeId}`)
+      .pipe(
+        map(u => UserMapper.fromResponse(u))
+      );
+  }
+
 }

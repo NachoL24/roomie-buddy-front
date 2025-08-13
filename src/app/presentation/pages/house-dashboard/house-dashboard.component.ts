@@ -13,11 +13,12 @@ import { InviteMemberDialogComponent } from '@presentation/pages/house-dashboard
 import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense-card/house-expense-card.component';
 import { PayRatioDialogComponent } from './pay-ratio-dialog.component';
 import { HouseSettlementBalancesComponent } from './house-settlement-balances.component';
+import { HouseInvitationListComponent } from "./house-invitation-list.component";
 
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent, NgOptimizedImage],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent, NgOptimizedImage, HouseInvitationListComponent],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -56,10 +57,10 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
           <div class="header">
             <h2 class="table-title">Members</h2>
             <div class="buttons">
-              <button matIconButton (click)="openInvite()">
+              <button mat-icon-button (click)="openInvite()">
                 <mat-icon>group_add</mat-icon>
               </button>
-              <button matIconButton (click)="openSettings()">
+              <button mat-icon-button (click)="openSettings()">
                 <mat-icon>settings</mat-icon>
               </button>
             </div>
@@ -81,6 +82,11 @@ import { HouseSettlementBalancesComponent } from './house-settlement-balances.co
           </ul>
           <section class="balances-section">
             <app-house-balance [house]="house()!"></app-house-balance>
+          </section>
+          <section class="invitations-section">
+            @if (!!house()?.id) {
+              <app-house-invitation-list [houseId]="house()!.id"></app-house-invitation-list>
+            }
           </section>
         </aside>
       </div>
@@ -173,7 +179,10 @@ export class HouseDashboardComponent implements OnInit {
   ngOnInit(): void {
     // Initial load
     const initialId = Number(this.route.snapshot.paramMap.get('id'));
-    if (initialId) this.refresh(initialId);
+    if (initialId) {
+      // Defer to next microtask to avoid ExpressionChangedAfterItHasBeenCheckedError
+      queueMicrotask(() => this.refresh(initialId));
+    }
 
     // Also refresh on every navigation end (covers same-URL navigations)
     this.router.events.subscribe(evt => {

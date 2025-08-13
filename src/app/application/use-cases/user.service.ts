@@ -7,6 +7,7 @@ import { User } from '../../domain/entities';
   providedIn: 'root'
 })
 export class UserService {
+
   constructor(private userRepository: UserRepository) { }
 
   updateUserProfile(id: number, userData: Partial<User>): Observable<User> {
@@ -21,7 +22,11 @@ export class UserService {
     return this.userRepository.getOrCreateUserFromBackend();
   }
 
-  findUserByEmail(email: string): Observable<User[]> {
-    return this.userRepository.findUserByEmail(email);
+  findUserByEmail(email: string, houseId: number): Observable<User[]> {
+    return this.userRepository.findUserByEmail(email, houseId);
+  }
+
+  findUserById(inviteeId: number) {
+    return this.userRepository.findUserById(inviteeId);
   }
 }

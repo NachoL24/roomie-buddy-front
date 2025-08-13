@@ -64,7 +64,7 @@ export class InvitationRestClient extends InvitationRepository {
 
     getInvitationsByHouse(houseId: number): Observable<Invitation[]> {
         return this.http.get<InvitationResponseDto[]>(`${this.apiBaseUrl}/invitations/house/${houseId}`)
-            .pipe(map(invitations => invitations.map(InvitationMapper.fromResponse)));
+            .pipe(map(invitations => invitations.map(i => InvitationMapper.fromResponse(i))));
     }
 
     getInvitationsByUser(userId: number): Observable<Invitation[]> {
