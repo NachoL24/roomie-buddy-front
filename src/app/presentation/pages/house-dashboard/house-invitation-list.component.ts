@@ -24,7 +24,7 @@ import { switchMap, tap, finalize } from "rxjs/operators";
       @for (inv of invitations(); track inv.id) {
         <mat-card appearance="outlined" class="item">
           <span class="user-name">{{ getUserFullName(inv.inviteeId) }}</span>
-          <button mat-icon-button matTooltip="Cancelar invitación" class="close-button">
+          <button mat-icon-button matTooltip="Cancelar invitación" class="close-button" (click)="cancelInvitation(inv.id)">
             <mat-icon>close</mat-icon>
           </button>
         </mat-card>
@@ -79,8 +79,7 @@ export class HouseInvitationListComponent implements OnInit {
       if (id != null) {
         this.refresh();
       }
-    },
-    { allowSignalWrites: true }
+    }
   );
 
   ngOnInit() { }
