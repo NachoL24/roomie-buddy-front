@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+Dockerfile
+dockerfile
+Dockerfile.*
+dist
+.tmp
+.cache
+**/npm-debug.log
+**/yarn-error.log
+**/.DS_Store
+**/Thumbs.db

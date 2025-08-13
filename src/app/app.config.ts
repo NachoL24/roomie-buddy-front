@@ -4,7 +4,8 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, NativeDateAdapter } fro
 
 import { routes } from './app.routes';
 import { provideAuth0, authHttpInterceptorFn } from '@auth0/auth0-angular';
-import { environment } from '../environments/env';
+import { getEnvironment } from '../environments/runtime-env';
+const environment = getEnvironment();
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { REPOSITORY_PROVIDERS } from './infrastructure/providers/repository.providers';
 
