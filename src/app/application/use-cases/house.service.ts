@@ -26,7 +26,7 @@ export class HouseService {
     return this.houseRepository.createHouse(name);
   }
 
-  updateHouseName(houseId: number, name: string): Observable<House> {
+  updateHouseName(houseId: number, name: string): Observable<HouseMinimal> {
     return this.houseRepository.updateHouseName(houseId, name);
   }
 

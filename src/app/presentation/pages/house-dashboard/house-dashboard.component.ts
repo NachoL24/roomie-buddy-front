@@ -24,7 +24,24 @@ import { NavigationService } from '@presentation/shared/services';
   template: `
   @if (house()) {
     <div class="house-dashboard">
-        <h1 class="house-title">{{ house()?.name }}</h1>
+        <div class="house-title-row">
+          @if (!isEditingName()) {
+            <h1 class="house-title">{{ house()?.name }}</h1>
+            <button mat-icon-button (click)="startEditName()" [disabled]="!house()" matTooltip="Editar nombre">
+              <mat-icon>edit</mat-icon>
+            </button>
+          } @else {
+            <div class="edit-house-name">
+              <input class="name-input" [value]="nameDraft()" (input)="nameDraft.set(($any($event.target).value))" [disabled]="saving()" />
+              <button mat-icon-button color="primary" (click)="saveEditName()" [disabled]="saving() || !nameDraft().trim()" matTooltip="Guardar">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button (click)="cancelEditName()" [disabled]="saving()" matTooltip="Cancelar">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
 
 
       <div class="content">
@@ -106,6 +123,24 @@ import { NavigationService } from '@presentation/shared/services';
     :host { display: block; }
     .house-title {
       margin-top: 8px;
+    }
+    .house-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .edit-house-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .name-input {
+      font-size: 1.8rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--mat-sys-outline-variant);
+      color: var(--mat-sys-on-surface);
+      background: var(--mat-sys-surface);
     }
     .header-content {
       display: flex;
@@ -214,6 +249,11 @@ export class HouseDashboardComponent implements OnInit {
   pageSize = signal<number>(10);
   readonly pageSizeOptions = [5, 10, 20, 50];
 
+  // Inline edit state for house name
+  isEditingName = signal<boolean>(false);
+  nameDraft = signal<string>('');
+  saving = signal<boolean>(false);
+
   ngOnInit(): void {
     // Initial load
     const initialId = Number(this.route.snapshot.paramMap.get('id'));
@@ -298,6 +338,42 @@ export class HouseDashboardComponent implements OnInit {
       if (ok && this.house()) {
         this.snackBar.open('Ratios actualizados', 'Cerrar', { duration: 2500 });
         this.refresh(this.house()!.id);
+      }
+    });
+  }
+
+  // --- Inline edit handlers ---
+  startEditName() {
+    if (!this.house()) return;
+    this.nameDraft.set(this.house()!.name);
+    this.isEditingName.set(true);
+  }
+
+  cancelEditName() {
+    this.isEditingName.set(false);
+    this.nameDraft.set('');
+  }
+
+  saveEditName() {
+    if (!this.house()) return;
+    const newName = this.nameDraft().trim();
+    if (!newName) return;
+    if (newName === this.house()!.name) {
+      this.cancelEditName();
+      return;
+    }
+    this.saving.set(true);
+    this.houseService.updateHouseName(this.house()!.id, newName).subscribe({
+      next: (updated) => {
+        this.house.set({ ...this.house()!, name: updated.name });
+        this.snackBar.open('Nombre actualizado', 'Cerrar', { duration: 2500 });
+        this.isEditingName.set(false);
+        this.saving.set(false);
+      },
+      error: (e: any) => {
+        console.error('Error updating house name:', e);
+        this.snackBar.open('No se pudo actualizar el nombre', 'Cerrar', { duration: 3000 });
+        this.saving.set(false);
       }
     });
   }

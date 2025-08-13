@@ -35,10 +35,10 @@ export class HouseRestClient extends HouseRepository {
       .pipe(map(house => HouseMapper.fromResponseMinimal(house)));
   }
 
-  updateHouseName(houseId: number, name: string): Observable<House> {
+  updateHouseName(houseId: number, name: string): Observable<HouseMinimal> {
     const request = HouseMapper.toUpdateNameRequest(name);
     return this.http.put<HouseResponseDto>(`${this.apiBaseUrl}/houses/${houseId}/name`, request)
-      .pipe(map(HouseMapper.fromResponse));
+      .pipe(map(h => HouseMapper.fromResponseMinimal(h)));
   }
 
   updatePayRatios(houseId: number, payRatios: PayRatioUpdate[]): Observable<void> {

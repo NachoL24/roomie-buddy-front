@@ -10,7 +10,7 @@ export abstract class HouseRepository {
     abstract getHouseById(id: number): Observable<House>;
     abstract getHousesByRoomie(roomieId: number): Observable<HouseMinimal[]>;
     abstract createHouse(name: string): Observable<HouseMinimal>;
-    abstract updateHouseName(houseId: number, name: string): Observable<House>;
+    abstract updateHouseName(houseId: number, name: string): Observable<HouseMinimal>;
     abstract updatePayRatios(houseId: number, payRatios: PayRatioUpdate[]): Observable<void>;
     abstract leaveHouse(houseId: number): Observable<void>;
     abstract removeMember(houseId: number, roomieId: number): Observable<void>;
