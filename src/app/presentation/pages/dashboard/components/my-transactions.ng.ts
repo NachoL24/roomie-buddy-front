@@ -10,6 +10,7 @@ import { MatButton, MatButtonModule } from "@angular/material/button";
 import { MatDialog } from "@angular/material/dialog";
 import { NewTransactionDialogComponent } from "./new-transaction-dialog.ng";
 import { MyResumeComponent } from "./my-resume.ng";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @Component({
   selector: "app-my-transactions",
@@ -19,12 +20,16 @@ import { MyResumeComponent } from "./my-resume.ng";
     MatPaginatorModule,
     MatProgressSpinnerModule,
     TransactionCardComponent,
-    MatButtonModule
+    MatButtonModule,
+    MatTooltipModule
   ],
   template: `
     <div class="transactions-container">
       <div class="transactions-header">
-        <h1 class="title">Últimas Transacciones</h1>
+        <div class="header-content">
+          <h1 class="title">Últimas Transacciones</h1>
+          <mat-icon class="info-icon" matTooltip="Click derecho en una transacción para más opciones">info</mat-icon>
+        </div>
         <button class="new-transaction-button" matButton="filled" color="primary" (click)="newTransaction()">Nueva Transacción</button>
       </div>
 
@@ -73,6 +78,17 @@ import { MyResumeComponent } from "./my-resume.ng";
       align-items: center;
       margin-top: 8px;
       margin-bottom: 12px;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .info-icon {
+      margin-left: 4px;
+      font-size: 15px;
+      color: var(--mat-sys-on-surface);
     }
 
     .title {

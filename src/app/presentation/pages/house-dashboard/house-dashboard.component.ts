@@ -14,11 +14,12 @@ import { HouseExpenseCardComponent } from '@presentation/shared/ui/house-expense
 import { PayRatioDialogComponent } from './pay-ratio-dialog.component';
 import { HouseSettlementBalancesComponent } from './house-settlement-balances.component';
 import { HouseInvitationListComponent } from "./house-invitation-list.component";
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-house-dashboard',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent, NgOptimizedImage, HouseInvitationListComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatPaginatorModule, HouseExpenseCardComponent, HouseSettlementBalancesComponent, NgOptimizedImage, HouseInvitationListComponent, MatTooltipModule],
   template: `
   @if (house()) {
     <div class="house-dashboard">
@@ -28,8 +29,11 @@ import { HouseInvitationListComponent } from "./house-invitation-list.component"
       <div class="content">
         <section class="transactions">
           <div class="header">
+            <div class="header-content">
             <h2 class="table-title">Transacciones</h2>
-            <button mat-stroked-button color="primary" (click)="openNewExpense()">
+            <mat-icon class="info-icon" matTooltip="Click derecho en una transacción para más opciones">info</mat-icon>
+            </div>
+            <button class="new-transaction-button" mat-flat-button color="primary" (click)="openNewExpense()">
               <mat-icon>add</mat-icon>
               Nueva Transacción
             </button>
@@ -101,6 +105,16 @@ import { HouseInvitationListComponent } from "./house-invitation-list.component"
     .house-title {
       margin-top: 8px;
     }
+    .header-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .info-icon {
+      margin-left: 4px;
+      font-size: 15px;
+      color: var(--mat-sys-on-surface);
+    }
     .house-dashboard {
       display: flex;
       flex-direction: column;
@@ -159,6 +173,18 @@ import { HouseInvitationListComponent } from "./house-invitation-list.component"
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         grid-gap: 16px;
         gap: 16px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .new-transaction-button {
+        width: 100%;
       }
     }
   `]
