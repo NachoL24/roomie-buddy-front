@@ -1,26 +1,45 @@
-import { HostListener, inject, Injectable, OnInit, signal } from '@angular/core';
+import { inject, Injectable, DestroyRef, signal } from '@angular/core';
 import { GlobalUserService } from '@application/index';
 import { Subject } from 'rxjs';
+import { fromEvent } from 'rxjs';
+import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
-export class NavigationService implements OnInit {
+export class NavigationService {
   private scrollToSectionSubject = new Subject<string>();
   private userService = inject(GlobalUserService);
   private drawerOpen = false;
   private drawerMode = signal<"side" | "over">("side");
   private device = signal<"mobile" | "desktop">("desktop");
+  private destroyRef = inject(DestroyRef);
 
-  ngOnInit() {
-    this.drawerMode.set(window.innerWidth < 660 ? "over" : "side");
-    this.device.set(window.innerWidth < 660 ? "mobile" : "desktop");
-  }
+  constructor() {
+    const compute = (w: number) => ({
+      mode: w < 660 ? "over" as const : "side" as const,
+      device: w < 660 ? "mobile" as const : "desktop" as const,
+    });
 
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    this.drawerMode.set(window.innerWidth < 660 ? "over" : "side");
-    this.device.set(window.innerWidth < 660 ? "mobile" : "desktop");
+    // Initial state
+    const init = compute(window.innerWidth);
+    this.drawerMode.set(init.mode);
+    this.device.set(init.device);
+
+    // React to window resize
+    fromEvent(window, 'resize')
+      .pipe(
+        map(() => window.innerWidth),
+        startWith(window.innerWidth),
+        map(compute),
+        distinctUntilChanged((a, b) => a.mode === b.mode && a.device === b.device),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(({ mode, device }) => {
+        this.drawerMode.set(mode);
+        this.device.set(device);
+      });
   }
 
   scrollToSection$ = this.scrollToSectionSubject.asObservable();
@@ -48,5 +67,13 @@ export class NavigationService implements OnInit {
 
   toggleDrawerMode() {
     this.drawerMode.set(this.drawerMode() === "side" ? "over" : "side");
+  }
+
+  isMobile() {
+    return this.device() === "mobile";
+  }
+
+  isDesktop() {
+    return this.device() === "desktop";
   }
 }

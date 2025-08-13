@@ -22,7 +22,7 @@ import { HouseInvitationListComponent } from "./house-invitation-list.component"
   template: `
   @if (house()) {
     <div class="house-dashboard">
-        <h1>{{ house()?.name }}</h1>
+        <h1 class="house-title">{{ house()?.name }}</h1>
 
 
       <div class="content">
@@ -98,6 +98,9 @@ import { HouseInvitationListComponent } from "./house-invitation-list.component"
   `,
   styles: [`
     :host { display: block; }
+    .house-title {
+      margin-top: 8px;
+    }
     .house-dashboard {
       display: flex;
       flex-direction: column;

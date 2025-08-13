@@ -10,6 +10,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TransactionDetailsDialogComponent } from '../transaction-details-dialog/transaction-details-dialog.component';
 import { IncomeService, PersonalExpenseService, GlobalUserService } from '../../../..';
+import { NavigationService } from '@presentation/shared/services';
 
 @Component({
   selector: 'app-transaction-card',
@@ -31,13 +32,15 @@ import { IncomeService, PersonalExpenseService, GlobalUserService } from '../../
       [matContextMenuTriggerFor]="canEdit ? contextMenu : null">
       <mat-card-content>
         <div class="transaction-content">
+          @if (navigationService.isDesktop()) {
           <div class="transaction-icon">
-            @if (isIncoming) {
-              <mat-icon class="income-icon">trending_up</mat-icon>
-            } @else {
-              <mat-icon class="expense-icon">trending_down</mat-icon>
-            }
-          </div>
+              @if (isIncoming) {
+                <mat-icon class="income-icon">trending_up</mat-icon>
+              } @else {
+                <mat-icon class="expense-icon">trending_down</mat-icon>
+              }
+            </div>
+          }
           <div class="transaction-details">
             <div class="transaction-description">{{ activity.description }}</div>
             @if (activity.personal) {
@@ -201,6 +204,7 @@ export class TransactionCardComponent implements OnChanges {
   private incomeService = inject(IncomeService);
   private snackBar = inject(MatSnackBar);
   private globalUser = inject(GlobalUserService);
+  navigationService = inject(NavigationService);
 
   isIncoming = false;
   isOutgoing = false;

@@ -24,8 +24,8 @@ import { MyResumeComponent } from "./my-resume.ng";
   template: `
     <div class="transactions-container">
       <div class="transactions-header">
-      <h1 class="title">Últimas Transacciones</h1>
-      <button matButton="filled" color="primary" (click)="newTransaction()">Nueva Transacción</button>
+        <h1 class="title">Últimas Transacciones</h1>
+        <button class="new-transaction-button" matButton="filled" color="primary" (click)="newTransaction()">Nueva Transacción</button>
       </div>
 
       @if (loading()) {
@@ -64,8 +64,6 @@ import { MyResumeComponent } from "./my-resume.ng";
   `,
   styles: [`
     .transactions-container {
-      //padding: 16px;
-      max-width: 1200px;
       margin: 0 auto;
     }
 
@@ -140,6 +138,18 @@ import { MyResumeComponent } from "./my-resume.ng";
     @media (max-width: 768px) {
       .transactions-container {
         padding: 12px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .transactions-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .new-transaction-button {
+        width: 100%;
       }
     }
   `]
