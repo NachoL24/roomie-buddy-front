@@ -27,6 +27,7 @@ export class UserMapper {
       name: user.firstName!,
       surname: user.lastName!,
       document: user.doc!,
+      picture: user.pic
     };
   }
 }
