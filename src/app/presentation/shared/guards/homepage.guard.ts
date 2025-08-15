@@ -10,19 +10,19 @@ export const homepageGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   return auth0.isLoading$.pipe(
-      filter(loading => !loading), // Esperar a que Auth0 termine de cargar
-      take(1),
-      switchMap(() =>
-        auth0.isAuthenticated$.pipe(
-          take(1),
-          map(isAuthenticated => {
-            if (isAuthenticated) {
-              router.navigate(['/dashboard']);
-              return false;
-            }
-            return true;
-          })
-        )
+    filter(loading => !loading), // Esperar a que Auth0 termine de cargar
+    take(1),
+    switchMap(() =>
+      auth0.isAuthenticated$.pipe(
+        take(1),
+        map(isAuthenticated => {
+          if (isAuthenticated) {
+            router.navigate(['/dashboard']);
+            return false;
+          }
+          return true;
+        })
       )
-    );
+    )
+  );
 };
