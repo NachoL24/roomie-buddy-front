@@ -5,9 +5,10 @@ export interface CreateUserRequestDto {
 }
 
 export interface UpdateUserRequestDto {
-  firstName?: string;
-  lastName?: string;
-  document?: string;
+  name: string;
+  surname: string;
+  document: string;
+  picture?: string;
 }
 
 export interface UserResponseDto {
