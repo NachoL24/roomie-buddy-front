@@ -2,15 +2,14 @@ import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { GlobalUserService } from '@application/use-cases';
-import { LoadingComponent } from '@presentation/shared/ui/loading/loading.component';
 import { LoadingService } from '@presentation/shared/services';
 import { combineLatest, filter, take, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-auth-callback',
   standalone: true,
-  imports: [LoadingComponent],
-  template: `<app-loading />`,
+  imports: [],
+  template: ``,
   styles: []
 })
 export class AuthCallbackComponent implements OnInit, OnDestroy {
@@ -21,8 +20,8 @@ export class AuthCallbackComponent implements OnInit, OnDestroy {
   private subscription = new Subscription();
 
   ngOnInit() {
-    // Mostrar loading al iniciar
-    this.loadingService.show();
+    // Forzar el overlay global de loading mientras se resuelve el callback
+    this.loadingService.forceOn();
 
     // Esperar a que Auth0 termine de procesar y el usuario esté cargado
     this.subscription.add(
@@ -36,7 +35,7 @@ export class AuthCallbackComponent implements OnInit, OnDestroy {
         // Una vez autenticado, esperar a que el usuario esté listo y redirigir
         this.subscription.add(
           this.globalUserService.loadOnce$().subscribe(() => {
-            this.loadingService.hide();
+            this.loadingService.forceOff();
             this.router.navigate(['/dashboard']);
           })
         );
@@ -46,6 +45,6 @@ export class AuthCallbackComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
-    this.loadingService.hide();
+    this.loadingService.forceOff();
   }
 }

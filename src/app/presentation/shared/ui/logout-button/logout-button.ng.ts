@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuItem } from "@angular/material/menu";
-import { AuthService } from "@auth0/auth0-angular";
+import { AuthenticationService } from "@application/index";
 
 @Component({
   selector: "login-logout-button",
@@ -38,7 +38,7 @@ import { AuthService } from "@auth0/auth0-angular";
 })
 export class LogoutButtonComponent {
 
-  constructor(public authService: AuthService) { }
+  constructor(public authService: AuthenticationService) { }
 
   async logout(): Promise<void> {
     this.authService.logout();

@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 })
 export class LoadingService {
   private _isLoading = signal(true);
+  private _forceLoading = signal(false);
   private globalUserService = inject(GlobalUserService);
   private auth = inject(AuthService);
   // Mantener Router disponible por si se requiere en el futuro, pero evitar navegar desde efectos
@@ -23,6 +24,12 @@ export class LoadingService {
 
   constructor() {
     effect(() => {
+      // Si está forzado, mantener loading activo y no evaluar el resto
+      if (this._forceLoading()) {
+        this.show();
+        return;
+      }
+
       const authLoading = this.isLoading$();
       const authenticated = this.isAuthenticated();
       const userReady = this.globalUserService.ready();
@@ -55,11 +62,15 @@ export class LoadingService {
   }
 
   show() {
-    this._isLoading.set(true);
+    if (!this._isLoading()) {
+      this._isLoading.set(true);
+    }
   }
 
   hide() {
-    this._isLoading.set(false);
+    if (this._isLoading()) {
+      this._isLoading.set(false);
+    }
     // Importante: no navegar aquí. La navegación desde un efecto puede causar bucles de change detection (NG0103).
     // La redirección post-login se maneja explícitamente en AuthCallbackComponent y guards.
   }
@@ -67,4 +78,8 @@ export class LoadingService {
   toggle() {
     this._isLoading.set(!this._isLoading());
   }
+
+  // Fuerza el estado de loading para escenarios como el callback de Auth0
+  forceOn() { this._forceLoading.set(true); this.show(); }
+  forceOff() { this._forceLoading.set(false); this.hide(); }
 }
