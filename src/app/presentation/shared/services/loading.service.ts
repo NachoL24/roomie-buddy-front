@@ -11,6 +11,7 @@ export class LoadingService {
   private _isLoading = signal(true);
   private globalUserService = inject(GlobalUserService);
   private auth = inject(AuthService);
+  // Mantener Router disponible por si se requiere en el futuro, pero evitar navegar desde efectos
   private router = inject(Router);
 
   // Auth0 states as signals
@@ -59,7 +60,8 @@ export class LoadingService {
 
   hide() {
     this._isLoading.set(false);
-    this.router.navigate(['/dashboard']);
+    // Importante: no navegar aquí. La navegación desde un efecto puede causar bucles de change detection (NG0103).
+    // La redirección post-login se maneja explícitamente en AuthCallbackComponent y guards.
   }
 
   toggle() {
