@@ -46,3 +46,4 @@ Thumbs.db
 /src/environments/env.ts
 
 /docs/*
+/public/env.js
